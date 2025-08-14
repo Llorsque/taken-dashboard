@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="script.js"></script>
 </head>
 <body>
   <aside class="sidebar">
@@ -27,17 +27,17 @@
   </aside>
 
   <main class="content">
-    <div id="urgentAlert" class="alert hidden"><i class="fa-solid fa-triangle-exclamation"></i> Er zijn urgente taken met rode status.</div>
+    <div id="urgentAlert" class="alert hidden"><i class="fa-solid fa-triangle-exclamation"></i> Er zijn urgente taken (rood).</div>
 
     <!-- DASHBOARD -->
     <section id="dashboard" class="view active">
       <h1>Dagdashboard</h1>
 
       <div class="grid-3">
-        <!-- Suggesties op urgentie -->
+        <!-- Suggesties -->
         <div class="card">
           <div class="card-header"><i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)</div>
-          <ul id="suggestList" class="list droplist" data-list="suggest"></ul>
+          <ul id="suggestList" class="list"></ul>
         </div>
 
         <!-- Dagplanning -->
@@ -48,11 +48,11 @@
             <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
             <span id="planInfo" class="muted"></span>
           </div>
-          <ul id="dayPlanList" class="list droplist" data-list="dayplan"></ul>
+          <ul id="dayPlanList" class="list droptarget" aria-label="Sleep taken hierheen"></ul>
           <div id="dayChecklist" class="checklist hidden"></div>
         </div>
 
-        <!-- Overzicht per categorie -->
+        <!-- Categorieën -->
         <div class="card">
           <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per categorie</div>
           <div id="categoryOverview" class="chips"></div>
@@ -60,7 +60,7 @@
       </div>
     </section>
 
-    <!-- ALLE TAKEN -->
+    <!-- Alle taken -->
     <section id="tasks" class="view">
       <h1>Alle taken</h1>
       <div class="filters">
@@ -83,16 +83,16 @@
           <option value="safe">Groen (laag)</option>
         </select>
       </div>
-      <ul id="taskList" class="list droplist" data-list="all"></ul>
+      <ul id="taskList" class="list"></ul>
     </section>
 
-    <!-- TOEVOEGEN -->
+    <!-- Toevoegen -->
     <section id="add" class="view">
       <h1>Nieuwe taak</h1>
       <form id="addForm" class="form">
         <label>Titel<input id="addTitle" type="text" required/></label>
         <label>Deadline<input id="addDeadline" type="date" required/></label>
-        <label>Urgentie (optioneel, anders automatisch)
+        <label>Urgentie (optioneel)
           <select id="addUrgency">
             <option value="">Automatisch</option>
             <option value="urgent">Rood (hoog)</option>
@@ -126,7 +126,7 @@
       </form>
     </section>
 
-    <!-- KALENDER -->
+    <!-- Kalender -->
     <section id="calendar" class="view">
       <h1>Kalender</h1>
       <div class="calendar-controls">
@@ -137,19 +137,19 @@
       <div id="calendarGrid" class="calendar"></div>
     </section>
 
-    <!-- ACHTERSTALLIG -->
+    <!-- Achterstallig -->
     <section id="overdue" class="view">
       <h1>Achterstallige taken</h1>
       <ul id="overdueList" class="list"></ul>
     </section>
 
-    <!-- ARCHIEF -->
+    <!-- Archief -->
     <section id="archive" class="view">
       <h1>Archief</h1>
       <ul id="archiveList" class="list"></ul>
     </section>
 
-    <!-- NOTITIES -->
+    <!-- Notities -->
     <section id="notes" class="view">
       <h1>Notitieblok</h1>
       <form id="noteForm" class="form">
@@ -161,7 +161,7 @@
       <ul id="noteList" class="list"></ul>
     </section>
 
-    <!-- MONITORING -->
+    <!-- Monitoring -->
     <section id="monitor" class="view">
       <h1>Monitoring</h1>
       <div class="stats">
@@ -173,7 +173,7 @@
     </section>
   </main>
 
-  <!-- DETAILS PANE (rechterzijbalk) -->
+  <!-- Rechterzijbalk details -->
   <aside id="detailPane" class="detail-pane">
     <div class="detail-header">
       <strong>Taakdetails</strong>
@@ -219,7 +219,5 @@
       </div>
     </div>
   </aside>
-
-  <script src="script.js"></script>
 </body>
 </html>
