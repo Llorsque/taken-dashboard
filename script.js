@@ -58,6 +58,7 @@ async function init(){
   setupDayPlanDropZone();
 
   renderAll();
+  startClock();
 }
 
 // ================== Daily reset ==================
@@ -118,6 +119,7 @@ function onAddTask(e){
   e.target.reset();
   showView('dashboard');
   renderAll();
+  startClock();
 }
 
 // ================== Notes ==================
@@ -225,6 +227,7 @@ function toggleDone(id, checked){
     overdueIds = overdueIds.filter(x=>x!==id);
     persistAll();
     renderAll();
+  startClock();
   } else {
     byId('unlockPlanBtn').classList.add('hidden');
     t.completedAt = null;
@@ -434,7 +437,8 @@ function saveDetail(){
   t.duration = byId('dDuration').value;
   t.progress = clamp(parseInt(byId('dProgress').value||'0',10),0,100);
   t.description = byId('dDesc').value.trim();
-  persistTasks(); renderAll(); closeDetail();
+  persistTasks(); renderAll();
+  startClock(); closeDetail();
 }
 function markDone(id){
   const t = tasks.find(x=>x.id===id);
@@ -444,7 +448,8 @@ function markDone(id){
   tasks = tasks.filter(x=>x.id!==id);
   dayPlan = dayPlan.filter(x=>x!==id);
   overdueIds = overdueIds.filter(x=>x!==id);
-  persistAll(); renderAll(); closeDetail();
+  persistAll(); renderAll();
+  startClock(); closeDetail();
 }
 
 // ================== Monitoring ==================
@@ -549,3 +554,14 @@ function navigate(view){
   showView(view);
   return false;
 }
+
+
+function two(n){ return String(n).padStart(2,'0'); }
+function updateClock(){
+  const now = new Date();
+  const dateStr = `${two(now.getDate())}-${two(now.getMonth()+1)}-${now.getFullYear()}`;
+  const timeStr = `${two(now.getHours())}:${two(now.getMinutes())}:${two(now.getSeconds())}`;
+  const el = document.getElementById('clock');
+  if(el){ el.textContent = `– ${dateStr} ${timeStr}`; }
+}
+function startClock(){ updateClock(); setInterval(updateClock, 1000); }
