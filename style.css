@@ -1,69 +1,55 @@
 
 body {
     margin: 0;
-    font-family: 'Archivo', Arial, sans-serif;
-    background-color: #f4f6f8;
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fa;
     color: #212945;
 }
-.app-container {
-    display: flex;
-    height: 100vh;
-}
 .sidebar {
-    background-color: #212945;
-    color: white;
     width: 220px;
+    background: #212945;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
     padding: 20px;
 }
-.sidebar h2 { margin-top: 0; }
-.sidebar ul { list-style: none; padding: 0; }
-.sidebar li { padding: 10px; cursor: pointer; border-radius: 5px; }
-.sidebar li:hover { background-color: #52E8E8; color: #212945; }
-.main-content {
-    flex: 1; padding: 20px; overflow-y: auto;
+.sidebar h2 { margin-bottom: 20px; }
+.sidebar button {
+    background: none;
+    color: white;
+    border: none;
+    padding: 10px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
 }
-.task-list, .note-list { list-style: none; padding: 0; }
-.task-list li, .note-list li {
+.main-content {
+    margin-left: 240px;
+    padding: 20px;
+}
+section { display: none; }
+section.active { display: block; }
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+.task-item {
     background: white;
     margin-bottom: 10px;
     padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
-textarea, input, select {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-}
-button {
-    background-color: #52E8E8;
-    color: #212945;
-    border: none;
+.drop-zone {
+    border: 2px dashed #52E8E8;
     padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px;
 }
-button:hover { opacity: 0.9; }
-.urgent { color: red; font-weight: bold; }
-.warning { color: orange; font-weight: bold; }
-.safe { color: green; font-weight: bold; }
-.hidden { display: none; }
-.bar {
+textarea {
     width: 100%;
-    background-color: #ddd;
-    height: 10px;
-    border-radius: 5px;
+    height: 100px;
+    margin-bottom: 10px;
 }
-#progressBar {
-    height: 10px;
-    background-color: #52E8E8;
-    border-radius: 5px;
-    width: 0%;
-}
-.alert { background-color: #ffcccc; color: red; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
-.filters select { margin-right: 5px; }

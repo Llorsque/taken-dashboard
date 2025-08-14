@@ -1,111 +1,48 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taken Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taken Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.umd.min.js"></script>
 </head>
 <body>
-<div class="app-container">
-    <nav class="sidebar">
-        <h2>Menu</h2>
-        <ul>
-            <li onclick="showSection('dashboard')">📋 Dashboard</li>
-            <li onclick="showSection('addTask')">➕ Taak toevoegen</li>
-            <li onclick="showSection('calendar')">📅 Kalender</li>
-            <li onclick="showSection('archive')">🗂 Archief</li>
-            <li onclick="showSection('notes')">📝 Notitieblok</li>
-        </ul>
-    </nav>
+<div class="sidebar">
+    <h2>Menu</h2>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('tasks')">Taken</button>
+    <button onclick="showSection('notes')">Notitieblok</button>
+    <button onclick="showSection('monitor')">Monitoring</button>
+</div>
 
-    <main class="main-content">
-        <!-- Dashboard -->
-        <section id="dashboardSection">
-            <h1>Dagstart</h1>
-            <div id="urgentAlert" class="alert hidden"></div>
-            <input type="text" id="focusInput" placeholder="Wat is mijn belangrijkste focus vandaag?">
+<div class="main-content">
+    <section id="dashboard" class="active">
+        <h1>Dagstart</h1>
+        <div id="day-plan" class="drop-zone">
+            <h3>Top 5 Taken van Vandaag</h3>
+            <ul id="top-tasks" class="task-list"></ul>
+        </div>
+        <button onclick="confirmTasks()">Bevestig Dagplanning</button>
+    </section>
 
-            <h2>Vandaag's Top 3 Taken</h2>
-            <ul id="topTasks" class="task-list"></ul>
+    <section id="tasks">
+        <h1>Alle Taken</h1>
+        <div id="all-tasks" class="task-list"></div>
+    </section>
 
-            <h2>Alle Taken</h2>
-            <div class="filters">
-                <select id="categoryFilter" onchange="applyFilters()">
-                    <option value="">Alle categorieën</option>
-                    <option value="Communicatie">Communicatie</option>
-                    <option value="Uitzoekwerk">Uitzoekwerk</option>
-                    <option value="Overleg">Overleg</option>
-                    <option value="Creatief">Creatief</option>
-                    <option value="Administratie">Administratie</option>
-                    <option value="Overig">Overig</option>
-                </select>
-                <select id="durationFilter" onchange="applyFilters()">
-                    <option value="">Alle duur</option>
-                    <option value="Kort">Kort (<15m)</option>
-                    <option value="Gemiddeld">Gemiddeld (15-60m)</option>
-                    <option value="Lang">Lang (>1u)</option>
-                </select>
-            </div>
-            <ul id="taskList" class="task-list"></ul>
+    <section id="notes">
+        <h1>Notitieblok</h1>
+        <textarea id="note-input" placeholder="Schrijf hier je notitie..."></textarea>
+        <button onclick="saveNote()">Opslaan</button>
+        <ul id="note-list"></ul>
+    </section>
 
-            <div class="progress">
-                <label>Punten deze week</label>
-                <div class="bar"><div id="progressBar"></div></div>
-                <span id="pointsCount">0</span>
-            </div>
-        </section>
-
-        <!-- Add Task -->
-        <section id="addTaskSection" class="hidden">
-            <h1>Nieuwe Taak</h1>
-            <input type="text" id="taskName" placeholder="Taaknaam">
-            <input type="date" id="taskDeadline">
-            <select id="taskUrgency">
-                <option value="">Automatisch urgentie bepalen</option>
-                <option value="urgent">Rood - urgent</option>
-                <option value="warning">Geel - medium</option>
-                <option value="safe">Groen - laag</option>
-            </select>
-            <select id="taskCategory">
-                <option value="">Categorie</option>
-                <option value="Communicatie">Communicatie</option>
-                <option value="Uitzoekwerk">Uitzoekwerk</option>
-                <option value="Overleg">Overleg</option>
-                <option value="Creatief">Creatief</option>
-                <option value="Administratie">Administratie</option>
-                <option value="Overig">Overig</option>
-            </select>
-            <select id="taskDuration">
-                <option value="">Tijdsduur</option>
-                <option value="Kort">Kort (<15m)</option>
-                <option value="Gemiddeld">Gemiddeld (15-60m)</option>
-                <option value="Lang">Lang (>1u)</option>
-            </select>
-            <textarea id="taskDescription" placeholder="Omschrijving"></textarea>
-            <button onclick="addTask()">Opslaan</button>
-        </section>
-
-        <!-- Calendar -->
-        <section id="calendarSection" class="hidden">
-            <h1>Kalender</h1>
-            <div id="calendarView"></div>
-        </section>
-
-        <!-- Archive -->
-        <section id="archiveSection" class="hidden">
-            <h1>Archief</h1>
-            <ul id="archiveList" class="task-list"></ul>
-        </section>
-
-        <!-- Notes -->
-        <section id="notesSection" class="hidden">
-            <h1>Notitieblok</h1>
-            <textarea id="noteInput" placeholder="Schrijf hier je notitie..."></textarea>
-            <button onclick="addNote()">Notitie opslaan</button>
-            <ul id="notesList" class="note-list"></ul>
-        </section>
-    </main>
+    <section id="monitor">
+        <h1>Monitoring</h1>
+        <canvas id="progressChart" width="400" height="200"></canvas>
+    </section>
 </div>
 
 <script src="script.js"></script>
