@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <script defer src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <aside class="sidebar">
@@ -27,7 +27,6 @@
   </aside>
 
   <main class="content">
-    <!-- ALERTS -->
     <div id="urgentAlert" class="alert hidden"><i class="fa-solid fa-triangle-exclamation"></i> Er zijn urgente taken met rode status.</div>
 
     <!-- DASHBOARD -->
@@ -45,6 +44,7 @@
         <div class="card">
           <div class="card-header"><i class="fa-solid fa-sun"></i> Mijn dagplanning</div>
           <div class="card-actions">
+            <button class="btn" onclick="showView('add')"><i class="fa-solid fa-plus"></i> Taak toevoegen</button>
             <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
             <span id="planInfo" class="muted"></span>
           </div>
@@ -219,5 +219,7 @@
       </div>
     </div>
   </aside>
+
+  <script src="script.js"></script>
 </body>
 </html>

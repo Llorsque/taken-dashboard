@@ -6,23 +6,18 @@ const ls = {
 };
 
 // ---------- State ----------
-let tasks = [];       // array of task objects
-let archive = [];     // completed tasks
-let overdueIds = [];  // task ids that became overdue via daily reset
-let dayPlan = [];     // array of task ids planned for today (order matters)
+let tasks = [];       // task objects
+let archive = [];
+let overdueIds = [];  // ids for overdue tasks
+let dayPlan = [];     // ordered ids planned for today
 let dayPlanLocked = false;
 let lastPlanDate = null;
 let notes = [];
 
-// ---------- Task shape ----------
-// id, title, description, deadline(YYYY-MM-DD), urgencyOverride('urgent'|'warning'|'safe'|''), type, category,
-// duration('Kort'|'Gemiddeld'|'Lang'), progress(0..100), createdAt, plannedDay(YYYY-MM-DD|null), done(bool), completedAt(ISO|null)
-
 // ---------- Init ----------
 document.addEventListener('DOMContentLoaded', init);
-
 async function init(){
-  // Load persisted state
+  // Load persisted
   tasks = ls.get('tasks', []);
   archive = ls.get('archive', []);
   overdueIds = ls.get('overdueIds', []);
@@ -31,54 +26,48 @@ async function init(){
   lastPlanDate = ls.get('lastPlanDate', null);
   notes = ls.get('notes', []);
 
-  // If first run and tasks empty, try loading initial JSON (optional)
+  // First time: try JSON files
   if(tasks.length === 0){
     try {
       const t = await fetch('tasks.json'); if (t.ok) tasks = await t.json();
       const a = await fetch('archive.json'); if (a.ok) archive = await a.json();
-    } catch(e){ /* ignore for offline */ }
+    } catch(e){}
   }
 
   dailyRollOverIfNeeded();
 
-  // Wire up nav
-  document.querySelectorAll('.nav button').forEach(btn => {
-    btn.addEventListener('click', () => showView(btn.dataset.target));
-  });
+  // Nav
+  document.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.target)));
 
-  // Close detail pane
+  // Detail pane
   document.getElementById('detailClose').addEventListener('click', closeDetail);
 
-  // Add form
+  // Forms
   document.getElementById('addForm').addEventListener('submit', onAddTask);
-
-  // Notes form
   document.getElementById('noteForm').addEventListener('submit', onAddNote);
 
-  // Calendar nav
+  // Calendar controls
   document.getElementById('calPrev').addEventListener('click', () => { shiftMonth(-1); renderCalendar(); });
   document.getElementById('calNext').addEventListener('click', () => { shiftMonth(1); renderCalendar(); });
 
-  // Confirm day plan
+  // Day plan confirm
   document.getElementById('confirmPlanBtn').addEventListener('click', confirmDayPlan);
 
-  // Initial render
   renderAll();
 }
 
 // ---------- Daily rollover ----------
-function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
 function dailyRollOverIfNeeded(){
   const today = todayISO();
   if(lastPlanDate && lastPlanDate !== today){
-    // Move any uncompleted planned tasks to overdue
-    const stillPlanned = dayPlan.filter(id => {
-      const t = tasks.find(x => x.id===id);
+    // Move unfinished planned tasks to overdue
+    const unfinished = dayPlan.filter(id => {
+      const t = tasks.find(x=>x.id===id);
       return t && !t.done;
     });
-    const newOverdue = [...new Set([...overdueIds, ...stillPlanned])];
-    overdueIds = newOverdue;
-    // Clear plan & unlock
+    overdueIds = [...new Set([...overdueIds, ...unfinished])];
+    // Reset plan
     dayPlan = [];
     dayPlanLocked = false;
     ls.set('overdueIds', overdueIds);
@@ -105,23 +94,23 @@ function showView(id){
 // ---------- Add task ----------
 function onAddTask(e){
   e.preventDefault();
-  const title = byId('addTitle').value.trim();
-  const deadline = byId('addDeadline').value; // ISO
+  const title = gid('addTitle').value.trim();
+  const deadline = gid('addDeadline').value; // ISO yyyy-mm-dd
   if(!title || !deadline){ alert('Vul minimaal titel en deadline in.'); return; }
-  const urgency = byId('addUrgency').value;
-  const type = byId('addType').value;
-  const category = byId('addCategory').value.trim();
-  const duration = byId('addDuration').value;
-  const progress = clamp(parseInt(byId('addProgress').value || '0',10), 0, 100);
-  const description = byId('addDesc').value.trim();
+  const urgency = gid('addUrgency').value;
+  const type = gid('addType').value;
+  const category = gid('addCategory').value.trim();
+  const duration = gid('addDuration').value;
+  const progress = clamp(parseInt(gid('addProgress').value||'0',10),0,100);
+  const description = gid('addDesc').value.trim();
 
   const t = {
-    id: cryptoRandomId(),
+    id: rid(),
     title, description,
     deadline, urgencyOverride: urgency || '',
     type, category, duration, progress,
     createdAt: new Date().toISOString(),
-    plannedDay: null, done: false, completedAt: null
+    plannedDay: null, done:false, completedAt:null
   };
   tasks.push(t);
   persistTasks();
@@ -133,26 +122,26 @@ function onAddTask(e){
 // ---------- Notes ----------
 function onAddNote(e){
   e.preventDefault();
-  const title = byId('noteTitle').value.trim();
-  const category = byId('noteCategory').value.trim();
-  const text = byId('noteText').value.trim();
-  if(!title && !text){ return; }
-  notes.push({ id: cryptoRandomId(), title, category, text, createdAt: new Date().toISOString() });
+  const title = gid('noteTitle').value.trim();
+  const category = gid('noteCategory').value.trim();
+  const text = gid('noteText').value.trim();
+  if(!title && !text) return;
+  notes.push({ id: rid(), title, category, text, createdAt: new Date().toISOString() });
   persistNotes();
   e.target.reset();
   renderNotes();
 }
 function renderNotes(){
-  const ul = byId('noteList'); ul.innerHTML='';
+  const ul = gid('noteList'); ul.innerHTML='';
   notes.forEach(n => {
     const li = document.createElement('li');
     li.className='item';
     li.innerHTML = `
       <div class="item-main">
-        <div class="title">${escapeHTML(n.title || '(zonder titel)')}</div>
+        <div class="title">${esc(n.title || '(zonder titel)')}</div>
       </div>
       <div class="meta">
-        ${n.category ? `<span class="badge">${escapeHTML(n.category)}</span>`:''}
+        ${n.category ? `<span class="badge">${esc(n.category)}</span>`:''}
         <button class="btn" onclick="noteToTask('${n.id}')"><i class="fa-solid fa-plus"></i> Maak taak</button>
         <button class="icon-btn" title="Verwijder" onclick="deleteNote('${n.id}')"><i class="fa-solid fa-trash"></i></button>
       </div>`;
@@ -163,8 +152,8 @@ function noteToTask(id){
   const n = notes.find(x=>x.id===id);
   if(!n) return;
   showView('add');
-  byId('addTitle').value = n.title || n.text.slice(0,60);
-  byId('addCategory').value = n.category || '';
+  gid('addTitle').value = n.title || (n.text||'').slice(0,60);
+  gid('addCategory').value = n.category || '';
 }
 function deleteNote(id){
   notes = notes.filter(n=>n.id!==id);
@@ -180,26 +169,25 @@ function renderDashboard(){
 }
 
 function renderUrgentAlert(){
-  const alert = byId('urgentAlert');
+  const alert = gid('urgentAlert');
   const anyUrgent = getOpenTasks().some(t => getUrgency(t)==='urgent');
   alert.classList.toggle('hidden', !anyUrgent);
 }
 
 function renderSuggestions(){
-  const ul = byId('suggestList'); ul.innerHTML='';
+  const ul = gid('suggestList'); ul.innerHTML='';
   const suggestions = getOpenTasks().sort(sortByUrgencyDeadline).slice(0,8);
   suggestions.forEach(t => ul.appendChild(taskItem(t, {draggable:true, showProgress:true})));
-  makeDroppable(ul, 'suggest');
+  makeDroppable(ul, 'suggest'); // visual only
 }
 
 function renderDayPlan(){
-  const list = byId('dayPlanList');
-  const checklist = byId('dayChecklist');
-  const info = byId('planInfo');
+  const list = gid('dayPlanList');
+  const checklist = gid('dayChecklist');
+  const info = gid('planInfo');
   const plannedTasks = dayPlan.map(id => tasks.find(t=>t.id===id)).filter(Boolean);
 
   if(dayPlanLocked){
-    // Show checklist
     list.classList.add('hidden');
     checklist.classList.remove('hidden');
     info.textContent = 'Dagplanning bevestigd — werk de taken hieronder af.';
@@ -209,24 +197,21 @@ function renderDayPlan(){
       row.className='check-item';
       row.innerHTML = `
         <input type="checkbox" ${t.done?'checked':''} onchange="toggleDone('${t.id}', this.checked)" />
-        <div class="title">${escapeHTML(t.title)}</div>
-        <div class="meta"><i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)} • <span class="badge ${getUrgency(t)}">${urgLabel(getUrgency(t))}</span></div>
-      `;
+        <div class="title">${esc(t.title)}</div>
+        <div class="meta"><i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)} • <span class="badge ${getUrgency(t)}">${urgLabel(getUrgency(t))}</span></div>`;
       checklist.appendChild(row);
     });
   } else {
-    // Drag & drop plan builder
     list.classList.remove('hidden');
     checklist.classList.add('hidden');
     info.textContent = 'Sleep taken hierheen en klik Bevestig.';
     list.innerHTML = '';
     plannedTasks.forEach(t => list.appendChild(taskItem(t, {draggable:true, showProgress:true})));
-    makeDroppable(list, 'dayplan');
+    makeDroppable(list, 'dayplan'); // real drop target
   }
 }
 
 function confirmDayPlan(){
-  // Lock plan & stamp plannedDay
   dayPlanLocked = true;
   const today = todayISO();
   dayPlan.forEach(id => {
@@ -244,11 +229,9 @@ function toggleDone(id, checked){
   t.done = checked;
   if(checked){
     t.completedAt = new Date().toISOString();
-    // move to archive and remove from plan
     archive.push(t);
     tasks = tasks.filter(x=>x.id!==id);
     dayPlan = dayPlan.filter(x=>x!==id);
-    // also remove from overdue if present
     overdueIds = overdueIds.filter(x=>x!==id);
     persistAll();
     renderAll();
@@ -260,49 +243,44 @@ function toggleDone(id, checked){
 
 // ---------- Tasks view ----------
 function renderTasksView(){
-  // Populate category filter options from tasks
-  const uniqueCats = [...new Set(tasks.filter(t=>t.category).map(t=>t.category))];
-  const catSel = byId('filterCategory'); catSel.innerHTML = '<option value=\"\">Alle categorieën</option>' + uniqueCats.map(c=>`<option>${escapeHTML(c)}</option>`).join('');
-
-  const ul = byId('taskList'); ul.innerHTML='';
+  const uniqueCats = [...new Set(tasks.filter(t=>t.category).map(t=>t.category))].sort();
+  const catSel = gid('filterCategory'); catSel.innerHTML = '<option value=\"\">Alle categorieën</option>' + uniqueCats.map(c=>`<option>${esc(c)}</option>`).join('');
+  const ul = gid('taskList'); ul.innerHTML='';
   let list = getOpenTasks();
   const fc = catSel.value;
-  const ft = byId('filterType').value;
-  const fu = byId('filterUrgency').value;
+  const ft = gid('filterType').value;
+  const fu = gid('filterUrgency').value;
   if(fc) list = list.filter(t=>t.category===fc);
   if(ft) list = list.filter(t=>t.type===ft);
   if(fu) list = list.filter(t=>getUrgency(t)===fu);
-
   list.sort(sortByUrgencyDeadline).forEach(t => ul.appendChild(taskItem(t, {draggable:true, showProgress:true})));
   makeDroppable(ul, 'all');
 }
 
 // ---------- Category overview ----------
 function renderCategoryOverview(){
-  const wrap = byId('categoryOverview'); wrap.innerHTML='';
+  const wrap = gid('categoryOverview'); wrap.innerHTML='';
   const map = new Map();
   getOpenTasks().forEach(t => map.set(t.category||'Ongecategoriseerd', (map.get(t.category||'Ongecategoriseerd')||0)+1));
   [...map.entries()].sort().forEach(([cat,count]) => {
     const div = document.createElement('div');
-    div.className='chip'; div.innerHTML = `<i class="fa-solid fa-tag"></i> ${escapeHTML(cat)} <span class="count">${count}</span>`;
-    div.addEventListener('click', () => { showView('tasks'); byId('filterCategory').value = cat==='Ongecategoriseerd'?'':cat; renderTasksView(); });
+    div.className='chip'; div.innerHTML = `<i class="fa-solid fa-tag"></i> ${esc(cat)} <span class="count">${count}</span>`;
+    div.addEventListener('click', () => { showView('tasks'); gid('filterCategory').value = cat==='Ongecategoriseerd'?'':cat; renderTasksView(); });
     wrap.appendChild(div);
   });
 }
 
 // ---------- Overdue ----------
 function renderOverdue(){
-  const ul = byId('overdueList'); ul.innerHTML='';
-  overdueIds
-    .map(id => tasks.find(t=>t && t.id===id))
-    .filter(Boolean)
-    .sort(sortByUrgencyDeadline)
+  const ul = gid('overdueList'); ul.innerHTML='';
+  overdueIds.map(id => tasks.find(t=>t && t.id===id))
+    .filter(Boolean).sort(sortByUrgencyDeadline)
     .forEach(t => {
       const li = document.createElement('li');
       li.className='item';
       li.innerHTML = `
         <div class="item-main">
-          <div class="title">${escapeHTML(t.title)}</div>
+          <div class="title">${esc(t.title)}</div>
           <div class="meta"><i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)} • <span class="badge urgent">Achterstallig</span></div>
         </div>
         <div class="progress-wrap">
@@ -315,13 +293,13 @@ function renderOverdue(){
 
 // ---------- Archive ----------
 function renderArchive(){
-  const ul = byId('archiveList'); ul.innerHTML='';
+  const ul = gid('archiveList'); ul.innerHTML='';
   archive.slice().reverse().forEach(t => {
     const li = document.createElement('li');
     li.className='item';
     li.innerHTML = `
       <div class="item-main">
-        <div class="title">${escapeHTML(t.title)}</div>
+        <div class="title">${esc(t.title)}</div>
         <div class="meta"><i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)} • afgerond ${fmtDateTime(t.completedAt)}</div>
       </div>
       <div class="badge">Voortgang ${t.progress||0}%</div>`;
@@ -332,25 +310,21 @@ function renderArchive(){
 // ---------- Calendar ----------
 let calYear = (new Date()).getFullYear();
 let calMonth = (new Date()).getMonth();
-
 function shiftMonth(delta){
   calMonth += delta;
   if(calMonth<0){ calMonth=11; calYear--; }
   if(calMonth>11){ calMonth=0; calYear++; }
 }
-
 function renderCalendar(){
-  const title = byId('calTitle');
-  const grid = byId('calendarGrid');
+  const title = gid('calTitle');
+  const grid = gid('calendarGrid');
   const monthNames = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
   title.textContent = `${monthNames[calMonth]} ${calYear}`;
-
   grid.innerHTML='';
   const first = new Date(calYear, calMonth, 1);
   const last = new Date(calYear, calMonth+1, 0);
   const startOffset = (first.getDay()+6)%7; // Mon=0
   for(let i=0;i<startOffset;i++){ grid.appendChild(emptyCell()); }
-
   for(let d=1; d<=last.getDate(); d++){
     const dateISO = new Date(calYear, calMonth, d).toISOString().slice(0,10);
     const cell = document.createElement('div');
@@ -377,12 +351,12 @@ function taskItem(t, opts={}){
   li.innerHTML = `
     <div class="item-main">
       <button class="icon-btn" title="Details" onclick="openDetail('${t.id}')"><i class="fa-regular fa-pen-to-square"></i></button>
-      <div class="title">${escapeHTML(t.title)}</div>
+      <div class="title">${esc(t.title)}</div>
       <div class="meta">
         <i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)}
         <span class="badge ${getUrgency(t)}">${urgLabel(getUrgency(t))}</span>
-        ${t.category?`<span class="badge"><i class="fa-solid fa-tag"></i> ${escapeHTML(t.category)}</span>`:''}
-        ${t.type?`<span class="badge"><i class="fa-solid fa-list"></i> ${escapeHTML(t.type)}</span>`:''}
+        ${t.category?`<span class="badge"><i class="fa-solid fa-tag"></i> ${esc(t.category)}</span>`:''}
+        ${t.type?`<span class="badge"><i class="fa-solid fa-list"></i> ${esc(t.type)}</span>`:''}
       </div>
     </div>
     <div class="progress-wrap">
@@ -393,23 +367,45 @@ function taskItem(t, opts={}){
   if(opts.draggable){
     li.draggable = true;
     li.addEventListener('dragstart', (e)=>{
-      e.dataTransfer.setData('text/plain', JSON.stringify({id:t.id}));
+      try{
+        e.dataTransfer.setData('text/plain', t.id);
+        e.dataTransfer.setData('text', t.id);
+      }catch(_){}
+      e.dataTransfer.effectAllowed = 'move';
     });
   }
   return li;
 }
 
 function makeDroppable(el, listName){
-  el.addEventListener('dragover', e => e.preventDefault());
+  el.addEventListener('dragenter', e => { if(listName==='dayplan'){ el.classList.add('drop-active'); } });
+  el.addEventListener('dragleave', e => { if(listName==='dayplan'){ el.classList.remove('drop-active'); } });
+  el.addEventListener('dragover', e => { e.preventDefault(); if(e.dataTransfer) e.dataTransfer.dropEffect = 'move'; });
   el.addEventListener('drop', e => {
     e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-    if(listName==='dayplan') addToDayPlan(data.id);
+    if(listName!=='dayplan'){ el.classList.remove('drop-active'); return; }
+    let id = '';
+    try { id = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text'); } catch(_){}
+    if(!id) return;
+    if(!dayPlan.includes(id)) dayPlan.push(id);
+    const children = Array.from(el.children);
+    const targetLi = e.target.closest('li');
+    let toIndex = targetLi ? children.indexOf(targetLi) : children.length - 1;
+    if(toIndex < 0) toIndex = children.length;
+    const fromIndex = dayPlan.indexOf(id);
+    if(fromIndex > -1){
+      dayPlan.splice(fromIndex, 1);
+      if(toIndex > dayPlan.length) toIndex = dayPlan.length;
+      dayPlan.splice(toIndex, 0, id);
+    }
+    ls.set('dayPlan', dayPlan);
+    el.classList.remove('drop-active');
+    renderDayPlan();
   });
 }
 
 function addToDayPlan(id){
-  if(dayPlanLocked){ alert('Dagplanning is bevestigd. Ontgrendel door te wachten tot morgen of maak handmatig vrij in localStorage.'); return; }
+  if(dayPlanLocked){ alert('Dagplanning is bevestigd. Vrij vanaf 00:00 of reset handmatig.'); return; }
   if(!dayPlan.includes(id)) dayPlan.push(id);
   ls.set('dayPlan', dayPlan);
   renderDayPlan();
@@ -421,18 +417,18 @@ function openDetail(id){
   currentDetailId = id;
   const t = tasks.find(x=>x.id===id) || archive.find(x=>x.id===id);
   if(!t) return;
-  byId('dTitle').value = t.title||'';
-  byId('dDeadline').value = t.deadline||'';
-  byId('dUrgency').value = t.urgencyOverride||'';
-  byId('dType').value = t.type||'overig';
-  byId('dCategory').value = t.category||'';
-  byId('dDuration').value = t.duration||'Kort';
-  byId('dProgress').value = t.progress||0;
-  byId('dDesc').value = t.description||'';
+  gid('dTitle').value = t.title||'';
+  gid('dDeadline').value = t.deadline||'';
+  gid('dUrgency').value = t.urgencyOverride||'';
+  gid('dType').value = t.type||'overig';
+  gid('dCategory').value = t.category||'';
+  gid('dDuration').value = t.duration||'Kort';
+  gid('dProgress').value = t.progress||0;
+  gid('dDesc').value = t.description||'';
 
-  byId('dSave').onclick = saveDetail;
-  byId('dArchive').onclick = ()=> markDone(id);
-  byId('dToPlan').onclick = ()=> addToDayPlan(id);
+  gid('dSave').onclick = saveDetail;
+  gid('dArchive').onclick = ()=> markDone(id);
+  gid('dToPlan').onclick = ()=> addToDayPlan(id);
 
   document.getElementById('detailPane').classList.add('open');
 }
@@ -440,14 +436,14 @@ function closeDetail(){ document.getElementById('detailPane').classList.remove('
 function saveDetail(){
   const t = tasks.find(x=>x.id===currentDetailId);
   if(!t){ closeDetail(); return; }
-  t.title = byId('dTitle').value.trim()||t.title;
-  t.deadline = byId('dDeadline').value || t.deadline;
-  t.urgencyOverride = byId('dUrgency').value;
-  t.type = byId('dType').value;
-  t.category = byId('dCategory').value.trim();
-  t.duration = byId('dDuration').value;
-  t.progress = clamp(parseInt(byId('dProgress').value||'0',10),0,100);
-  t.description = byId('dDesc').value.trim();
+  t.title = gid('dTitle').value.trim()||t.title;
+  t.deadline = gid('dDeadline').value || t.deadline;
+  t.urgencyOverride = gid('dUrgency').value;
+  t.type = gid('dType').value;
+  t.category = gid('dCategory').value.trim();
+  t.duration = gid('dDuration').value;
+  t.progress = clamp(parseInt(gid('dProgress').value||'0',10),0,100);
+  t.description = gid('dDesc').value.trim();
   persistTasks();
   renderAll();
   closeDetail();
@@ -468,21 +464,16 @@ function markDone(id){
 
 // ---------- Monitoring ----------
 function renderMonitoring(){
-  // Completed total
-  byId('statCompleted').textContent = archive.length.toString();
-  // Percent on time
+  gid('statCompleted').textContent = archive.length.toString();
   const withDeadline = archive.filter(t=>t.deadline);
   const onTime = withDeadline.filter(t => new Date(t.completedAt) <= endOfDay(t.deadline));
   const pct = withDeadline.length? Math.round(onTime.length*100/withDeadline.length):0;
-  byId('statOnTime').textContent = pct + '%';
-  // Average duration (completion - creation) in hours
+  gid('statOnTime').textContent = pct + '%';
   const durations = archive.filter(t=>t.completedAt && t.createdAt).map(t => (new Date(t.completedAt) - new Date(t.createdAt))/36e5);
   const avg = durations.length? (durations.reduce((a,b)=>a+b,0)/durations.length).toFixed(1):'–';
-  byId('statAvgDur').textContent = avg==='–'?'–':(avg+' u');
-  // Weekly chart (simple per-day completion count of last 7 days)
+  gid('statAvgDur').textContent = avg==='–'?'–':(avg+' u');
   const ctx = document.getElementById('chartWeekly').getContext('2d');
-  const labels = [];
-  const data = [];
+  const labels=[], data=[];
   for(let i=6;i>=0;i--){
     const d = new Date(); d.setDate(d.getDate()-i);
     const key = d.toISOString().slice(0,10);
@@ -490,11 +481,7 @@ function renderMonitoring(){
     data.push(archive.filter(t=> (t.completedAt||'').slice(0,10)===key ).length);
   }
   if(window._weeklyChart) window._weeklyChart.destroy();
-  window._weeklyChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ label: 'Afgerond', data }] },
-    options: { responsive: true, maintainAspectRatio:false }
-  });
+  window._weeklyChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{label:'Afgerond', data}] }, options:{ responsive:true, maintainAspectRatio:false } });
 }
 
 // ---------- Helpers ----------
@@ -507,16 +494,13 @@ function renderAll(){
   renderCalendar();
   updateFiltersFromTasks();
 }
-
 function updateFiltersFromTasks(){
-  // Populate category filter (tasks view)
-  const catSel = byId('filterCategory');
+  const catSel = gid('filterCategory');
   const was = catSel.value;
   const cats = [...new Set(tasks.filter(t=>t.category).map(t=>t.category))].sort();
-  catSel.innerHTML = '<option value=\"\">Alle categorieën</option>' + cats.map(c=>`<option>${escapeHTML(c)}</option>`).join('');
+  catSel.innerHTML = '<option value=\"\">Alle categorieën</option>' + cats.map(c=>`<option>${esc(c)}</option>`).join('');
   if(cats.includes(was)) catSel.value = was;
 }
-
 function getOpenTasks(){ return tasks.filter(t=>!t.done); }
 function sortByUrgencyDeadline(a,b){
   const ua = urgRank(getUrgency(a)); const ub = urgRank(getUrgency(b));
@@ -532,11 +516,7 @@ function getUrgency(t){
   return 'safe';
 }
 function urgLabel(u){ return u==='urgent'?'Rood' : u==='warning'?'Geel' : 'Groen'; }
-function fmtDate(iso){
-  if(!iso) return '';
-  const y=iso.slice(0,4), m=iso.slice(5,7), d=iso.slice(8,10);
-  return `${d}-${m}-${y}`;
-}
+function fmtDate(iso){ if(!iso) return ''; const y=iso.slice(0,4), m=iso.slice(5,7), d=iso.slice(8,10); return `${d}-${m}-${y}`; }
 function fmtDateTime(iso){
   if(!iso) return '';
   const d = new Date(iso);
@@ -547,17 +527,12 @@ function fmtDateTime(iso){
   const mi=String(d.getMinutes()).padStart(2,'0');
   return `${dd}-${mm}-${yy} ${hh}:${mi}`;
 }
-function endOfDay(isoDate){
-  const d = new Date(isoDate + 'T23:59:59');
-  return d;
-}
+function endOfDay(isoDate){ return new Date(isoDate + 'T23:59:59'); }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-function byId(id){ return document.getElementById(id); }
-function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function cryptoRandomId(){ return (crypto.getRandomValues(new Uint32Array(4))).join('-'); }
-
+function gid(id){ return document.getElementById(id); }
+function esc(s){ return (s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function rid(){ return (crypto.getRandomValues(new Uint32Array(4))).join('-'); }
 function progressBar(pct){ pct = clamp(pct||0,0,100); return `<div class="progress"><span style="width:${pct}%"></span></div>`; }
-
 function persistTasks(){ ls.set('tasks', tasks); }
 function persistArchive(){ ls.set('archive', archive); }
 function persistOverdue(){ ls.set('overdueIds', overdueIds); }
@@ -565,7 +540,7 @@ function persistPlan(){ ls.set('dayPlan', dayPlan); ls.set('dayPlanLocked', dayP
 function persistNotes(){ ls.set('notes', notes); }
 function persistAll(){ persistTasks(); persistArchive(); persistOverdue(); persistPlan(); }
 
-// ---------- Filters change handlers ----------
+// Filters change handlers
 document.addEventListener('change', (e)=>{
   if(e.target && (e.target.id==='filterCategory' || e.target.id==='filterType' || e.target.id==='filterUrgency')){
     renderTasksView();

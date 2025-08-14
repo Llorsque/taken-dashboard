@@ -89,6 +89,9 @@ h1{margin:0 0 16px 0}
 .detail-body{display:grid; gap:10px}
 .detail-actions{display:flex; gap:10px; margin-top:8px}
 
+.droplist{min-height: 20px}
+.droplist.drop-active{outline: 2px dashed var(--aqua); outline-offset: 4px; background:#f0fbfb}
 .droplist .item{cursor:grab}
+
 .checklist{display:flex; flex-direction:column; gap:8px; margin-top:10px}
 .check-item{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid #e6e8ee; border-radius:12px; padding:10px}
