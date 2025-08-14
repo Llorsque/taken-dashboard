@@ -1,4 +1,3 @@
-
 // ================== Storage helpers & crypto ==================
 const LS = {
   get(k, d){ try{ const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch{ return d; } },
@@ -73,7 +72,18 @@ async function init(){
     if(!e.target.closest('.user-menu')) gid('userDropdown').classList.add('hidden');
   });
 
-  // Setup drop zone
+  // Mobile sidebar toggle
+  const menuBtn = gid('menuBtn'), sidebar = gid('sidebar'), scrim = gid('scrim');
+  if(menuBtn){
+    const closeSide = ()=>{ sidebar.classList.remove('open'); scrim.classList.remove('show'); };
+    const openSide  = ()=>{ sidebar.classList.add('open'); scrim.classList.add('show'); };
+    menuBtn.addEventListener('click', ()=> sidebar.classList.contains('open') ? closeSide() : openSide() );
+    scrim.addEventListener('click', closeSide);
+    // close when navigating
+    document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', closeSide));
+  }
+
+  // Setup drop zone (desktop)
   setupDayPlanDropZone();
 
   renderAll();
@@ -142,28 +152,12 @@ function applyProfileToUI(){
   gid('avatarInitials').textContent = initials;
   gid('ddName').textContent = userProfile.name||'Gebruiker';
   gid('ddEmail').textContent = userProfile.email||'';
-  // Prefill profile form
   gid('profName').value = userProfile.name||'';
   gid('profEmail').value = userProfile.email||'';
   gid('profDailyGoal').value = userProfile.prefs?.dailyGoal ?? 5;
   gid('profStart').value = userProfile.prefs?.workStart ?? '09:00';
   gid('profEnd').value = userProfile.prefs?.workEnd ?? '17:30';
   gid('profNotify').value = userProfile.prefs?.notify ?? 'none';
-}
-function onSaveProfile(e){
-  e.preventDefault();
-  if(!userProfile) return;
-  userProfile.name = gid('profName').value.trim();
-  userProfile.email = gid('profEmail').value.trim();
-  userProfile.prefs = {
-    dailyGoal: Math.max(1, Math.min(20, parseInt(gid('profDailyGoal').value||'5',10))),
-    workStart: gid('profStart').value || '09:00',
-    workEnd: gid('profEnd').value || '17:30',
-    notify: gid('profNotify').value || 'none'
-  };
-  LS.set('userProfile', userProfile);
-  applyProfileToUI();
-  alert('Profiel opgeslagen.');
 }
 
 // ================== Clock ==================
@@ -222,7 +216,7 @@ function showView(id){
 function onAddTask(e){
   e.preventDefault();
   const title = gid('addTitle').value.trim();
-  const deadline = gid('addDeadline').value; // ISO yyyy-mm-dd
+  const deadline = gid('addDeadline').value;
   if(!title || !deadline){ alert('Vul minimaal titel en deadline in.'); return; }
   const urgency = gid('addUrgency').value;
   const type = gid('addType').value;
@@ -316,12 +310,13 @@ function renderDayPlan(){
   } else {
     gid('unlockPlanBtn').classList.add('hidden');
     list.classList.remove('hidden'); checklist.classList.add('hidden');
-    info.textContent = 'Sleep taken hierheen en klik Bevestig.';
+    info.textContent = 'Sleep taken (desktop) of gebruik de knop “Plan vandaag”.';
     list.innerHTML='';
     planned.forEach(t => list.appendChild(taskRow(t, { draggable:true, inPlan:true })));
   }
 }
 
+// Confirm/unlock
 function confirmDayPlan(){
   dayPlanLocked = true;
   const today = todayISO();
@@ -442,8 +437,8 @@ function taskRow(t, {draggable=false, inPlan=false, overdueBadge=false}={}){
   li.dataset.id = t.id;
 
   const actionBtn = inPlan
-    ? `<button class="btn" onclick="removeFromDayPlan('${t.id}')" title="Uit dagplanning"><i class="fa-solid fa-minus"></i></button>`
-    : `<button class="btn" onclick="addToDayPlan('${t.id}')" title="Plan vandaag"><i class="fa-solid fa-calendar-plus"></i></button>`;
+    ? `<button class="btn" onclick="removeFromDayPlan('${t.id}')" title="Uit dagplanning"><i class="fa-solid fa-minus"></i> <span class="hide-sm">Verwijder</span></button>`
+    : `<button class="btn" onclick="addToDayPlan('${t.id}')" title="Plan vandaag"><i class="fa-solid fa-calendar-plus"></i> <span class="hide-sm">Plan</span></button>`;
 
   li.innerHTML = `
     <div class="item-main">
