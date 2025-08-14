@@ -343,7 +343,6 @@ function unlockDayPlan(){
 function renderSuggestions(){
   const ul = gid('suggestList'); ul.innerHTML='';
   let suggestions = getOpenTasks().sort(sortByUrgencyDeadline);
-  // limit by profile dailyGoal if set (fallback 5)
   const max = (userProfile?.prefs?.dailyGoal) ?? 5;
   suggestions = suggestions.slice(0, Math.max(5, max));
   suggestions.forEach(t => ul.appendChild(taskRow(t, { draggable:true })));
@@ -573,7 +572,24 @@ function toggleDone(id, checked){
 
 // ================== Monitoring ==================
 function renderMonitoring(){
-  gid('statCompleted').textContent = archive.length.toString();
+  gid('statOpen').textContent = getOpenTasks().length.toString();
+  gid('statOverdue').textContent = overdueIds.length.toString();
+  const goal = userProfile?.prefs?.dailyGoal ?? 5;
+  gid('statPlannedToday').textContent = `${dayPlan.length}/${goal}`;
+  const plannedTasks = dayPlan.map(id => tasks.find(t=>t.id===id) || archive.find(t=>t.id===id)).filter(Boolean);
+  const doneInPlan = plannedTasks.filter(t => t.done || archive.some(a=>a.id===t.id)).length;
+  gid('statPlanDone').textContent = plannedTasks.length ? Math.round(doneInPlan*100/plannedTasks.length)+'%' : '0%';
+  const open = getOpenTasks();
+  const avgProg = open.length? Math.round(open.reduce((s,t)=>s+(t.progress||0),0)/open.length):0;
+  gid('statAvgProgress').textContent = avgProg+'%';
+  const weekCount = archive.filter(t => {
+    const d = (t.completedAt||'').slice(0,10);
+    if(!d) return false;
+    const dt = new Date(d);
+    const now = new Date(); const diff = (now - dt)/86400000;
+    return diff<=7;
+  }).length;
+  gid('statWeekCompleted').textContent = weekCount.toString();
   const withDeadline = archive.filter(t=>t.deadline);
   const onTime = withDeadline.filter(t => new Date(t.completedAt) <= endOfDay(t.deadline));
   const pct = withDeadline.length? Math.round(onTime.length*100/withDeadline.length):0;
@@ -581,17 +597,6 @@ function renderMonitoring(){
   const durations = archive.filter(t=>t.completedAt && t.createdAt).map(t => (new Date(t.completedAt)-new Date(t.createdAt))/36e5);
   const avg = durations.length? (durations.reduce((a,b)=>a+b,0)/durations.length).toFixed(1):'–';
   gid('statAvgDur').textContent = avg==='–'?'–':(avg+' u');
-
-  const ctx = document.getElementById('chartWeekly').getContext('2d');
-  const labels = [], data = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const key = d.toISOString().slice(0,10);
-    labels.push(key.slice(8,10)+'-'+key.slice(5,7));
-    data.push(archive.filter(t=> (t.completedAt||'').slice(0,10)===key ).length);
-  }
-  if(window._weeklyChart) window._weeklyChart.destroy();
-  window._weeklyChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{label:'Afgerond', data}] }, options:{ responsive:true, maintainAspectRatio:false } });
 }
 
 // ================== Utilities & persistence ==================

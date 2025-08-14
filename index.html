@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="style.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body>
@@ -186,11 +185,15 @@
     <section id="monitor" class="view">
       <h1>Monitoring</h1>
       <div class="stats">
-        <div class="stat"><div class="stat-number" id="statCompleted">0</div><div class="stat-label">Afgerond (totaal)</div></div>
-        <div class="stat"><div class="stat-number" id="statOnTime">0%</div><div class="stat-label">% op tijd</div></div>
+        <div class="stat"><div class="stat-number" id="statOpen">0</div><div class="stat-label">Open taken</div></div>
+        <div class="stat"><div class="stat-number" id="statOverdue">0</div><div class="stat-label">Achterstallig</div></div>
+        <div class="stat"><div class="stat-number" id="statPlannedToday">0/0</div><div class="stat-label">Vandaag gepland / doel</div></div>
+        <div class="stat"><div class="stat-number" id="statPlanDone">0%</div><div class="stat-label">Dagplanning gereed</div></div>
+        <div class="stat"><div class="stat-number" id="statAvgProgress">0%</div><div class="stat-label">Gem. voortgang (open)</div></div>
+        <div class="stat"><div class="stat-number" id="statWeekCompleted">0</div><div class="stat-label">Afgerond (7 dagen)</div></div>
+        <div class="stat"><div class="stat-number" id="statOnTime">0%</div><div class="stat-label">% op tijd (historisch)</div></div>
         <div class="stat"><div class="stat-number" id="statAvgDur">–</div><div class="stat-label">Gem. doorlooptijd</div></div>
       </div>
-      <canvas id="chartWeekly" width="900" height="320"></canvas>
     </section>
 
     <!-- PROFIEL -->
