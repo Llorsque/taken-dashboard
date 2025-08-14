@@ -7,31 +7,60 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Dagstart</h1>
-        <input type="text" id="focusInput" placeholder="Wat is mijn belangrijkste focus vandaag?">
-        
-        <h2>Vandaag's Top 3 Taken</h2>
-        <ul id="topTasks"></ul>
+<div class="app-container">
+    <nav class="sidebar">
+        <h2>Menu</h2>
+        <ul>
+            <li onclick="showSection('dashboard')">📋 Dashboard</li>
+            <li onclick="showSection('addTask')">➕ Taak toevoegen</li>
+            <li onclick="showSection('calendar')">📅 Kalender</li>
+            <li onclick="showSection('archive')">🗂 Archief</li>
+        </ul>
+    </nav>
 
-        <button id="addTaskBtn">+ Taak toevoegen</button>
+    <main class="main-content">
+        <section id="dashboardSection">
+            <h1>Dagstart</h1>
+            <input type="text" id="focusInput" placeholder="Wat is mijn belangrijkste focus vandaag?">
 
-        <h2>Taken</h2>
-        <div class="tabs">
-            <button onclick="filterTasks('all')">Alles</button>
-            <button onclick="filterTasks('urgent')">Urgent</button>
-            <button onclick="filterTasks('week')">Deze week</button>
-            <button onclick="filterTasks('later')">Later</button>
-        </div>
-        <ul id="taskList"></ul>
+            <h2>Vandaag's Top 3 Taken</h2>
+            <ul id="topTasks" class="task-list"></ul>
 
-        <div class="progress">
-            <label>Punten deze week</label>
-            <div class="bar"><div id="progressBar"></div></div>
-            <span id="pointsCount">0</span>
-        </div>
-    </div>
+            <h2>Alle Taken</h2>
+            <div class="tabs">
+                <button onclick="renderTasks('all')">Alles</button>
+                <button onclick="renderTasks('urgent')">Urgent</button>
+                <button onclick="renderTasks('week')">Deze week</button>
+                <button onclick="renderTasks('later')">Later</button>
+            </div>
+            <ul id="taskList" class="task-list"></ul>
 
-    <script src="script.js"></script>
+            <div class="progress">
+                <label>Punten deze week</label>
+                <div class="bar"><div id="progressBar"></div></div>
+                <span id="pointsCount">0</span>
+            </div>
+        </section>
+
+        <section id="addTaskSection" class="hidden">
+            <h1>Nieuwe Taak</h1>
+            <input type="text" id="taskName" placeholder="Taaknaam">
+            <input type="date" id="taskDeadline">
+            <button onclick="addTask()">Opslaan</button>
+        </section>
+
+        <section id="calendarSection" class="hidden">
+            <h1>Kalender</h1>
+            <div id="calendarView"></div>
+        </section>
+
+        <section id="archiveSection" class="hidden">
+            <h1>Archief</h1>
+            <ul id="archiveList" class="task-list"></ul>
+        </section>
+    </main>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

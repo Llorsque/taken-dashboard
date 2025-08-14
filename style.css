@@ -1,47 +1,68 @@
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
     margin: 0;
+    font-family: 'Archivo', Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #212945;
+}
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    background-color: #212945;
+    color: white;
+    width: 220px;
+    padding: 20px;
+}
+.sidebar h2 {
+    margin-top: 0;
+}
+.sidebar ul {
+    list-style: none;
     padding: 0;
 }
-.container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-h1, h2 {
-    color: #212945;
-}
-#focusInput {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 20px;
-}
-#addTaskBtn {
-    background-color: #52E8E8;
-    color: #212945;
-    border: none;
+.sidebar li {
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
-    margin-bottom: 20px;
 }
-#taskList li, #topTasks li {
+.sidebar li:hover {
+    background-color: #52E8E8;
+    color: #212945;
+}
+.main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+.task-list li {
+    background: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
-    padding: 5px;
-    border-bottom: 1px solid #eee;
+    align-items: center;
 }
-.urgent { color: red; }
-.warning { color: orange; }
-.safe { color: green; }
-.progress {
-    margin-top: 20px;
+.urgent { color: red; font-weight: bold; }
+.warning { color: orange; font-weight: bold; }
+.safe { color: green; font-weight: bold; }
+.tabs button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #52E8E8;
+    color: #212945;
+    border-radius: 3px;
+    cursor: pointer;
 }
+.hidden { display: none; }
 .bar {
     width: 100%;
     background-color: #ddd;
