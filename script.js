@@ -543,3 +543,9 @@ function unlockDayPlan(){
   LS.set('dayPlanLocked', dayPlanLocked);
   renderDayPlan();
 }
+
+
+function navigate(view){
+  showView(view);
+  return false;
+}

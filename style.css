@@ -72,3 +72,10 @@ h1{ margin:0 0 16px 0 }
 /* Drag & drop visuals */
 .droptarget{ min-height: 24px; padding: 6px; border-radius: 12px; border: 2px dashed transparent }
 .droptarget.drag-over{ border-color: var(--aqua); background: #f0fbfb }
+
+.view{ display:none }
+.view.active{ display:block }
+.nav a{ color:#fff; text-decoration:none; padding:10px 12px; border-radius:10px; display:flex; gap:10px; align-items:center; font-size:15px }
+.nav a:hover{ background:#1a2138 }
+.item{ -webkit-user-drag: element; user-select:none }
+.item *{ user-select:none }

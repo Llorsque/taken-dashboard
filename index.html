@@ -9,20 +9,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body>
   <aside class="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
     <nav class="nav">
-      <button onclick="showView('dashboard')"><i class="fa-solid fa-list-check"></i> Dashboard</button>
-      <button onclick="showView('tasks')"><i class="fa-solid fa-table-list"></i> Alle taken</button>
-      <button onclick="showView('add')"><i class="fa-solid fa-plus"></i> Taak toevoegen</button>
-      <button onclick="showView('calendar')"><i class="fa-solid fa-calendar-days"></i> Kalender</button>
-      <button onclick="showView('overdue')"><i class="fa-solid fa-circle-exclamation"></i> Achterstallig</button>
-      <button onclick="showView('archive')"><i class="fa-solid fa-box-archive"></i> Archief</button>
-      <button onclick="showView('notes')"><i class="fa-solid fa-note-sticky"></i> Notitieblok</button>
-      <button onclick="showView('monitor')"><i class="fa-solid fa-chart-line"></i> Monitoring</button>
+      <a href="#" onclick="return navigate('dashboard')"><i class="fa-solid fa-list-check"></i> Dashboard</a>
+      <a href="#" onclick="return navigate('tasks')"><i class="fa-solid fa-table-list"></i> Alle taken</a>
+      <a href="#" onclick="return navigate('add')"><i class="fa-solid fa-plus"></i> Taak toevoegen</a>
+      <a href="#" onclick="return navigate('calendar')"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
+      <a href="#" onclick="return navigate('overdue')"><i class="fa-solid fa-circle-exclamation"></i> Achterstallig</a>
+      <a href="#" onclick="return navigate('archive')"><i class="fa-solid fa-box-archive"></i> Archief</a>
+      <a href="#" onclick="return navigate('notes')"><i class="fa-solid fa-note-sticky"></i> Notitieblok</a>
+      <a href="#" onclick="return navigate('monitor')"><i class="fa-solid fa-chart-line"></i> Monitoring</a>
     </nav>
   </aside>
 
