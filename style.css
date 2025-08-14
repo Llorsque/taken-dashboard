@@ -1,0 +1,56 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+h1, h2 {
+    color: #212945;
+}
+#focusInput {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+}
+#addTaskBtn {
+    background-color: #52E8E8;
+    color: #212945;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+#taskList li, #topTasks li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+.urgent { color: red; }
+.warning { color: orange; }
+.safe { color: green; }
+.progress {
+    margin-top: 20px;
+}
+.bar {
+    width: 100%;
+    background-color: #ddd;
+    height: 10px;
+    border-radius: 5px;
+}
+#progressBar {
+    height: 10px;
+    background-color: #52E8E8;
+    border-radius: 5px;
+    width: 0%;
+}

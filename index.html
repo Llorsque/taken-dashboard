@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taken Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Dagstart</h1>
+        <input type="text" id="focusInput" placeholder="Wat is mijn belangrijkste focus vandaag?">
+        
+        <h2>Vandaag's Top 3 Taken</h2>
+        <ul id="topTasks"></ul>
+
+        <button id="addTaskBtn">+ Taak toevoegen</button>
+
+        <h2>Taken</h2>
+        <div class="tabs">
+            <button onclick="filterTasks('all')">Alles</button>
+            <button onclick="filterTasks('urgent')">Urgent</button>
+            <button onclick="filterTasks('week')">Deze week</button>
+            <button onclick="filterTasks('later')">Later</button>
+        </div>
+        <ul id="taskList"></ul>
+
+        <div class="progress">
+            <label>Punten deze week</label>
+            <div class="bar"><div id="progressBar"></div></div>
+            <span id="pointsCount">0</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
