@@ -341,7 +341,7 @@ function taskRow(t, {draggable=false, calendarButton=false, inPlan=false, overdu
       </div>
     </div>
     <div class="progress-wrap">
-      ${progressBar(t.progress)}
+      ${progressBarFor(t)}
       <button class="btn" onclick="addToDayPlan('${t.id}')"><i class="fa-solid fa-calendar-plus"></i></button>
     </div>`;
 
@@ -565,3 +565,23 @@ function updateClock(){
   if(el){ el.textContent = `– ${dateStr} ${timeStr}`; }
 }
 function startClock(){ updateClock(); setInterval(updateClock, 1000); }
+
+
+function typeColor(type){
+  switch((type||'').toLowerCase()){
+    case 'mail': return '#3b82f6';
+    case 'telefoontje': return '#9333ea';
+    case 'uitzoekwerk': return '#4f46e5';
+    case 'overleg': return '#06b6d4';
+    case 'documentatie': return '#64748b';
+    case 'creatief': return '#ec4899';
+    case 'administratie': return '#f97316';
+    default: return '#94a3b8';
+  }
+}
+function progressBarFor(t){
+  const pct = Math.max(0, Math.min(100, t.progress||0));
+  const urg = getUrgency(t);
+  const color = typeColor(t.type);
+  return `<div class="progress ${urg}" style="--type-color:${color}"><span style="width:${pct}%"></span></div>`;
+}
