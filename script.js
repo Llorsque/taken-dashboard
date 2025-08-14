@@ -52,6 +52,7 @@ async function init(){
 
   // Confirm day plan
   byId('confirmPlanBtn').addEventListener('click', confirmDayPlan);
+  byId('unlockPlanBtn').addEventListener('click', unlockDayPlan);
 
   // Drag & Drop: set up only on the real drop zone (day plan)
   setupDayPlanDropZone();
@@ -176,6 +177,7 @@ function renderDayPlan(){
   const planned = dayPlan.map(id => tasks.find(t=>t.id===id)).filter(Boolean);
 
   if(dayPlanLocked){
+    byId('unlockPlanBtn').classList.remove('hidden');
     list.classList.add('hidden'); checklist.classList.remove('hidden');
     info.textContent = 'Dagplanning bevestigd — werk de taken hieronder af.';
     checklist.innerHTML = '';
@@ -189,6 +191,7 @@ function renderDayPlan(){
       checklist.appendChild(row);
     });
   } else {
+    byId('unlockPlanBtn').classList.add('hidden');
     list.classList.remove('hidden'); checklist.classList.add('hidden');
     info.textContent = 'Sleep taken hierheen en klik Bevestig.';
     list.innerHTML='';
@@ -223,6 +226,7 @@ function toggleDone(id, checked){
     persistAll();
     renderAll();
   } else {
+    byId('unlockPlanBtn').classList.add('hidden');
     t.completedAt = null;
     persistTasks();
   }
@@ -350,6 +354,7 @@ function taskRow(t, {draggable=false, calendarButton=false, inPlan=false, overdu
 function setupDayPlanDropZone(){
   const zone = byId('dayPlanList');
   // highlight on dragover
+  zone.addEventListener('dragenter', (e)=>{ e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragover', (e)=>{
     e.preventDefault();
     zone.classList.add('drag-over');
@@ -359,7 +364,8 @@ function setupDayPlanDropZone(){
   zone.addEventListener('drop', (e)=>{
     e.preventDefault();
     zone.classList.remove('drag-over');
-    if(dayPlanLocked){ alert('Dagplanning is bevestigd. Wacht tot morgen of reset handmatig.'); return; }
+    if(dayPlanLocked){
+    byId('unlockPlanBtn').classList.remove('hidden'); alert('Dagplanning is bevestigd. Wacht tot morgen of reset handmatig.'); return; }
     let id = ''; try{ id = e.dataTransfer.getData('text/plain'); }catch(_){}
     if(!id) return;
     // compute insertion index by mouse Y position
@@ -388,7 +394,8 @@ function dropIndexByY(container, y){
 
 // Direct add via button
 function addToDayPlan(id){
-  if(dayPlanLocked){ alert('Dagplanning is bevestigd. Wacht tot morgen of reset handmatig.'); return; }
+  if(dayPlanLocked){
+    byId('unlockPlanBtn').classList.remove('hidden'); alert('Dagplanning is bevestigd. Wacht tot morgen of reset handmatig.'); return; }
   if(!dayPlan.includes(id)) dayPlan.push(id);
   LS.set('dayPlan', dayPlan);
   renderDayPlan();
@@ -529,3 +536,10 @@ document.addEventListener('change', (e)=>{
     renderTasksView();
   }
 });
+
+
+function unlockDayPlan(){
+  dayPlanLocked = false;
+  LS.set('dayPlanLocked', dayPlanLocked);
+  renderDayPlan();
+}
