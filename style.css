@@ -15,32 +15,15 @@ body {
     width: 220px;
     padding: 20px;
 }
-.sidebar h2 {
-    margin-top: 0;
-}
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-}
-.sidebar li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-.sidebar li:hover {
-    background-color: #52E8E8;
-    color: #212945;
-}
+.sidebar h2 { margin-top: 0; }
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar li { padding: 10px; cursor: pointer; border-radius: 5px; }
+.sidebar li:hover { background-color: #52E8E8; color: #212945; }
 .main-content {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
+    flex: 1; padding: 20px; overflow-y: auto;
 }
-.task-list {
-    list-style: none;
-    padding: 0;
-}
-.task-list li {
+.task-list, .note-list { list-style: none; padding: 0; }
+.task-list li, .note-list li {
     background: white;
     margin-bottom: 10px;
     padding: 10px;
@@ -50,18 +33,25 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+textarea, input, select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+button {
+    background-color: #52E8E8;
+    color: #212945;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+button:hover { opacity: 0.9; }
 .urgent { color: red; font-weight: bold; }
 .warning { color: orange; font-weight: bold; }
 .safe { color: green; font-weight: bold; }
-.tabs button {
-    margin-right: 5px;
-    padding: 5px 10px;
-    border: none;
-    background-color: #52E8E8;
-    color: #212945;
-    border-radius: 3px;
-    cursor: pointer;
-}
 .hidden { display: none; }
 .bar {
     width: 100%;
@@ -75,3 +65,5 @@ body {
     border-radius: 5px;
     width: 0%;
 }
+.alert { background-color: #ffcccc; color: red; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+.filters select { margin-right: 5px; }
