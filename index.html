@@ -1,50 +1,223 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Taken Dashboard</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taken Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script defer src="script.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <h2>Menu</h2>
-    <button onclick="showSection('dashboard')">Dashboard</button>
-    <button onclick="showSection('tasks')">Taken</button>
-    <button onclick="showSection('notes')">Notitieblok</button>
-    <button onclick="showSection('monitor')">Monitoring</button>
-</div>
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
+    <nav class="nav">
+      <button data-target="dashboard"><i class="fa-solid fa-list-check"></i> Dashboard</button>
+      <button data-target="tasks"><i class="fa-solid fa-table-list"></i> Alle taken</button>
+      <button data-target="add"><i class="fa-solid fa-plus"></i> Taak toevoegen</button>
+      <button data-target="calendar"><i class="fa-solid fa-calendar-days"></i> Kalender</button>
+      <button data-target="overdue"><i class="fa-solid fa-circle-exclamation"></i> Achterstallig</button>
+      <button data-target="archive"><i class="fa-solid fa-box-archive"></i> Archief</button>
+      <button data-target="notes"><i class="fa-solid fa-note-sticky"></i> Notitieblok</button>
+      <button data-target="monitor"><i class="fa-solid fa-chart-line"></i> Monitoring</button>
+    </nav>
+  </aside>
 
-<div class="main-content">
-    <section id="dashboard" class="active">
-        <h1>Dagstart</h1>
-        <div id="day-plan" class="drop-zone">
-            <h3>Top 5 Taken van Vandaag</h3>
-            <ul id="top-tasks" class="task-list"></ul>
+  <main class="content">
+    <!-- ALERTS -->
+    <div id="urgentAlert" class="alert hidden"><i class="fa-solid fa-triangle-exclamation"></i> Er zijn urgente taken met rode status.</div>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="view active">
+      <h1>Dagdashboard</h1>
+
+      <div class="grid-3">
+        <!-- Suggesties op urgentie -->
+        <div class="card">
+          <div class="card-header"><i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)</div>
+          <ul id="suggestList" class="list droplist" data-list="suggest"></ul>
         </div>
-        <button onclick="confirmTasks()">Bevestig Dagplanning</button>
+
+        <!-- Dagplanning -->
+        <div class="card">
+          <div class="card-header"><i class="fa-solid fa-sun"></i> Mijn dagplanning</div>
+          <div class="card-actions">
+            <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
+            <span id="planInfo" class="muted"></span>
+          </div>
+          <ul id="dayPlanList" class="list droplist" data-list="dayplan"></ul>
+          <div id="dayChecklist" class="checklist hidden"></div>
+        </div>
+
+        <!-- Overzicht per categorie -->
+        <div class="card">
+          <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per categorie</div>
+          <div id="categoryOverview" class="chips"></div>
+        </div>
+      </div>
     </section>
 
-    <section id="tasks">
-        <h1>Alle Taken</h1>
-        <div id="all-tasks" class="task-list"></div>
+    <!-- ALLE TAKEN -->
+    <section id="tasks" class="view">
+      <h1>Alle taken</h1>
+      <div class="filters">
+        <select id="filterCategory"><option value="">Alle categorieën</option></select>
+        <select id="filterType">
+          <option value="">Alle typen</option>
+          <option value="mail">Mail</option>
+          <option value="telefoontje">Telefoontje</option>
+          <option value="uitzoekwerk">Uitzoekwerk</option>
+          <option value="overleg">Overleg</option>
+          <option value="documentatie">Documentatie</option>
+          <option value="creatief">Creatief</option>
+          <option value="administratie">Administratie</option>
+          <option value="overig">Overig</option>
+        </select>
+        <select id="filterUrgency">
+          <option value="">Alle urgenties</option>
+          <option value="urgent">Rood (hoog)</option>
+          <option value="warning">Geel (middel)</option>
+          <option value="safe">Groen (laag)</option>
+        </select>
+      </div>
+      <ul id="taskList" class="list droplist" data-list="all"></ul>
     </section>
 
-    <section id="notes">
-        <h1>Notitieblok</h1>
-        <textarea id="note-input" placeholder="Schrijf hier je notitie..."></textarea>
-        <button onclick="saveNote()">Opslaan</button>
-        <ul id="note-list"></ul>
+    <!-- TOEVOEGEN -->
+    <section id="add" class="view">
+      <h1>Nieuwe taak</h1>
+      <form id="addForm" class="form">
+        <label>Titel<input id="addTitle" type="text" required/></label>
+        <label>Deadline<input id="addDeadline" type="date" required/></label>
+        <label>Urgentie (optioneel, anders automatisch)
+          <select id="addUrgency">
+            <option value="">Automatisch</option>
+            <option value="urgent">Rood (hoog)</option>
+            <option value="warning">Geel (middel)</option>
+            <option value="safe">Groen (laag)</option>
+          </select>
+        </label>
+        <label>Type
+          <select id="addType">
+            <option value="mail">Mail</option>
+            <option value="telefoontje">Telefoontje</option>
+            <option value="uitzoekwerk">Uitzoekwerk</option>
+            <option value="overleg">Overleg</option>
+            <option value="documentatie">Documentatie</option>
+            <option value="creatief">Creatief</option>
+            <option value="administratie">Administratie</option>
+            <option value="overig">Overig</option>
+          </select>
+        </label>
+        <label>Categorie<input id="addCategory" type="text" placeholder="Bijv. Project X"/></label>
+        <label>Duur
+          <select id="addDuration">
+            <option value="Kort">Kort (&lt;15m)</option>
+            <option value="Gemiddeld">Gemiddeld (15–60m)</option>
+            <option value="Lang">Lang (&gt;1u)</option>
+          </select>
+        </label>
+        <label>Voortgang (0–100%)<input id="addProgress" type="number" min="0" max="100" value="0"/></label>
+        <label>Beschrijving<textarea id="addDesc" rows="4"></textarea></label>
+        <button class="btn primary" type="submit"><i class="fa-solid fa-plus"></i> Toevoegen</button>
+      </form>
     </section>
 
-    <section id="monitor">
-        <h1>Monitoring</h1>
-        <canvas id="progressChart" width="400" height="200"></canvas>
+    <!-- KALENDER -->
+    <section id="calendar" class="view">
+      <h1>Kalender</h1>
+      <div class="calendar-controls">
+        <button id="calPrev" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
+        <div id="calTitle"></div>
+        <button id="calNext" class="btn"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div id="calendarGrid" class="calendar"></div>
     </section>
-</div>
 
-<script src="script.js"></script>
+    <!-- ACHTERSTALLIG -->
+    <section id="overdue" class="view">
+      <h1>Achterstallige taken</h1>
+      <ul id="overdueList" class="list"></ul>
+    </section>
+
+    <!-- ARCHIEF -->
+    <section id="archive" class="view">
+      <h1>Archief</h1>
+      <ul id="archiveList" class="list"></ul>
+    </section>
+
+    <!-- NOTITIES -->
+    <section id="notes" class="view">
+      <h1>Notitieblok</h1>
+      <form id="noteForm" class="form">
+        <label>Titel<input id="noteTitle" type="text"/></label>
+        <label>Categorie<input id="noteCategory" type="text"/></label>
+        <label>Notitie<textarea id="noteText" rows="4"></textarea></label>
+        <button class="btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Opslaan</button>
+      </form>
+      <ul id="noteList" class="list"></ul>
+    </section>
+
+    <!-- MONITORING -->
+    <section id="monitor" class="view">
+      <h1>Monitoring</h1>
+      <div class="stats">
+        <div class="stat"><div class="stat-number" id="statCompleted">0</div><div class="stat-label">Afgerond (totaal)</div></div>
+        <div class="stat"><div class="stat-number" id="statOnTime">0%</div><div class="stat-label">% op tijd</div></div>
+        <div class="stat"><div class="stat-number" id="statAvgDur">–</div><div class="stat-label">Gem. doorlooptijd</div></div>
+      </div>
+      <canvas id="chartWeekly" width="900" height="320"></canvas>
+    </section>
+  </main>
+
+  <!-- DETAILS PANE (rechterzijbalk) -->
+  <aside id="detailPane" class="detail-pane">
+    <div class="detail-header">
+      <strong>Taakdetails</strong>
+      <button id="detailClose" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="detail-body">
+      <label>Titel<input id="dTitle" type="text"/></label>
+      <label>Deadline<input id="dDeadline" type="date"/></label>
+      <label>Urgentie
+        <select id="dUrgency">
+          <option value="">Automatisch</option>
+          <option value="urgent">Rood (hoog)</option>
+          <option value="warning">Geel (middel)</option>
+          <option value="safe">Groen (laag)</option>
+        </select>
+      </label>
+      <label>Type
+        <select id="dType">
+          <option value="mail">Mail</option>
+          <option value="telefoontje">Telefoontje</option>
+          <option value="uitzoekwerk">Uitzoekwerk</option>
+          <option value="overleg">Overleg</option>
+          <option value="documentatie">Documentatie</option>
+          <option value="creatief">Creatief</option>
+          <option value="administratie">Administratie</option>
+          <option value="overig">Overig</option>
+        </select>
+      </label>
+      <label>Categorie<input id="dCategory" type="text"/></label>
+      <label>Duur
+        <select id="dDuration">
+          <option value="Kort">Kort (&lt;15m)</option>
+          <option value="Gemiddeld">Gemiddeld (15–60m)</option>
+          <option value="Lang">Lang (&gt;1u)</option>
+        </select>
+      </label>
+      <label>Voortgang (0–100%)<input id="dProgress" type="number" min="0" max="100"/></label>
+      <label>Beschrijving<textarea id="dDesc" rows="4"></textarea></label>
+      <div class="detail-actions">
+        <button id="dSave" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Opslaan</button>
+        <button id="dArchive" class="btn"><i class="fa-solid fa-box-archive"></i> Markeer afgerond</button>
+        <button id="dToPlan" class="btn"><i class="fa-solid fa-calendar-check"></i> Plan voor vandaag</button>
+      </div>
+    </div>
+  </aside>
 </body>
 </html>
