@@ -12,7 +12,7 @@
   <script defer src="script.js"></script>
 
 </head>
-<body data-page="dashboard">
+<body data-page="cal">
     <aside class="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
     <nav class="nav">
@@ -50,33 +50,13 @@
   </header>
 
   <main class="content">
-      <h1>Dashboard</h1>
-  <div class="grid-1">
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-sun"></i> Mijn dagplanning</div>
-      <div class="card-actions">
-        <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
-        <button id="unlockPlanBtn" class="btn hidden"><i class="fa-solid fa-unlock"></i> Ontgrendel</button>
-        <span id="planInfo" class="muted"></span>
-      </div>
-      <ul id="dayPlanList" class="list droptarget" aria-label="Sleep taken hierheen"></ul>
-      <div id="dayChecklist" class="checklist hidden"></div>
-    </section>
-
-    <section class="card">
-      <div class="card-header">
-        <i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)
-        <span id="urgentChipCard" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountCard">0</span> urgent</span>
-      </div>
-      <ul id="suggestList" class="list"></ul>
-      <div class="muted smalltext">Taak maken? Gebruik het menu: <a class="inline-link" href="nieuwe-taak.html">Nieuwe taak</a>.</div>
-    </section>
-
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per type</div>
-      <div id="typeOverview" class="acc-list"></div>
-    </section>
+      <h1>Kalender</h1>
+  <div class="calendar-controls">
+    <button id="calPrev" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
+    <div id="calTitle"></div>
+    <button id="calNext" class="btn"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
+  <div id="calendarGrid" class="calendar"></div>
 
   </main>
     <div id="authOverlay" class="auth-overlay hidden">

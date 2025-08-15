@@ -12,7 +12,7 @@
   <script defer src="script.js"></script>
 
 </head>
-<body data-page="dashboard">
+<body data-page="add">
     <aside class="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
     <nav class="nav">
@@ -50,33 +50,42 @@
   </header>
 
   <main class="content">
-      <h1>Dashboard</h1>
-  <div class="grid-1">
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-sun"></i> Mijn dagplanning</div>
-      <div class="card-actions">
-        <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
-        <button id="unlockPlanBtn" class="btn hidden"><i class="fa-solid fa-unlock"></i> Ontgrendel</button>
-        <span id="planInfo" class="muted"></span>
-      </div>
-      <ul id="dayPlanList" class="list droptarget" aria-label="Sleep taken hierheen"></ul>
-      <div id="dayChecklist" class="checklist hidden"></div>
-    </section>
-
-    <section class="card">
-      <div class="card-header">
-        <i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)
-        <span id="urgentChipCard" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountCard">0</span> urgent</span>
-      </div>
-      <ul id="suggestList" class="list"></ul>
-      <div class="muted smalltext">Taak maken? Gebruik het menu: <a class="inline-link" href="nieuwe-taak.html">Nieuwe taak</a>.</div>
-    </section>
-
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per type</div>
-      <div id="typeOverview" class="acc-list"></div>
-    </section>
-  </div>
+      <h1>Nieuwe taak</h1>
+  <form id="addForm" class="form">
+    <label>Titel<input id="addTitle" type="text" required/></label>
+    <label>Deadline<input id="addDeadline" type="date" required/></label>
+    <label>Urgentie (optioneel)
+      <select id="addUrgency">
+        <option value="">Automatisch</option>
+        <option value="urgent">Rood (hoog)</option>
+        <option value="warning">Geel (middel)</option>
+        <option value="safe">Groen (laag)</option>
+      </select>
+    </label>
+    <label>Type
+      <select id="addType">
+        <option value="mail">Mail</option>
+        <option value="telefoontje">Telefoontje</option>
+        <option value="uitzoekwerk">Uitzoekwerk</option>
+        <option value="overleg">Overleg</option>
+        <option value="documentatie">Documentatie</option>
+        <option value="creatief">Creatief</option>
+        <option value="administratie">Administratie</option>
+        <option value="overig">Overig</option>
+      </select>
+    </label>
+    <label>Categorie<input id="addCategory" type="text" placeholder="Bijv. Project X"/></label>
+    <label>Duur
+      <select id="addDuration">
+        <option value="Kort">Kort (&lt;15m)</)</option>
+        <option value="Gemiddeld">Gemiddeld (15–60m)</option>
+        <option value="Lang">Lang (&gt;1u)</option>
+      </select>
+    </label>
+    <label>Voortgang (0–100%)<input id="addProgress" type="number" min="0" max="100" value="0"/></label>
+    <label>Beschrijving<textarea id="addDesc" rows="4"></textarea></label>
+    <button class="btn primary" type="submit"><i class="fa-solid fa-plus"></i> Toevoegen</button>
+  </form>
 
   </main>
     <div id="authOverlay" class="auth-overlay hidden">

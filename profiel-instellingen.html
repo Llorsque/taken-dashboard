@@ -12,7 +12,7 @@
   <script defer src="script.js"></script>
 
 </head>
-<body data-page="dashboard">
+<body data-page="profile">
     <aside class="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
     <nav class="nav">
@@ -50,33 +50,22 @@
   </header>
 
   <main class="content">
-      <h1>Dashboard</h1>
-  <div class="grid-1">
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-sun"></i> Mijn dagplanning</div>
-      <div class="card-actions">
-        <button id="confirmPlanBtn" class="btn primary"><i class="fa-solid fa-check-double"></i> Bevestig dagplanning</button>
-        <button id="unlockPlanBtn" class="btn hidden"><i class="fa-solid fa-unlock"></i> Ontgrendel</button>
-        <span id="planInfo" class="muted"></span>
-      </div>
-      <ul id="dayPlanList" class="list droptarget" aria-label="Sleep taken hierheen"></ul>
-      <div id="dayChecklist" class="checklist hidden"></div>
-    </section>
-
-    <section class="card">
-      <div class="card-header">
-        <i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)
-        <span id="urgentChipCard" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountCard">0</span> urgent</span>
-      </div>
-      <ul id="suggestList" class="list"></ul>
-      <div class="muted smalltext">Taak maken? Gebruik het menu: <a class="inline-link" href="nieuwe-taak.html">Nieuwe taak</a>.</div>
-    </section>
-
-    <section class="card">
-      <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per type</div>
-      <div id="typeOverview" class="acc-list"></div>
-    </section>
-  </div>
+      <h1>Profiel & Instellingen</h1>
+  <form id="profileForm" class="form">
+    <label>Naam<input id="profName" type="text"/></label>
+    <label>E‑mail<input id="profEmail" type="email"/></label>
+    <label>Dagdoel (max taken in planning)<input id="profDailyGoal" type="number" min="1" max="20" value="5"/></label>
+    <label>Werkuren (start)<input id="profStart" type="time" value="09:00"/></label>
+    <label>Werkuren (einde)<input id="profEnd" type="time" value="17:30"/></label>
+    <label>Notificaties
+      <select id="profNotify">
+        <option value="none">Uit</option>
+        <option value="banner">Banner</option>
+        <option value="sound">Banner + geluid</option>
+      </select>
+    </label>
+    <button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Opslaan</button>
+  </form>
 
   </main>
     <div id="authOverlay" class="auth-overlay hidden">
