@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Taken Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
   <script defer src="script.js"></script>
 </head>
 <body>
-  <!-- Sidebar -->
+  <!-- Sidebar (vast, desktop) -->
   <aside class="sidebar" id="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
     <nav class="nav">
@@ -27,11 +27,10 @@
       <a href="#" onclick="return navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</a>
     </nav>
   </aside>
-  <div class="scrim" id="scrim"></div>
 
-  <!-- Topbar with user + hamburger -->
+  <!-- Topbar -->
   <header class="topbar">
-    <button id="menuBtn" class="hamburger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="topbar-left"></div>
     <div class="topbar-right">
       <span id="urgentChipTop" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountTop">0</span> urgent</span>
       <div class="user-menu">
@@ -75,13 +74,12 @@
             <span id="urgentChipCard" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountCard">0</span> urgent</span>
           </div>
           <ul id="suggestList" class="list"></ul>
-          <div class="muted smalltext touch-hint"><i class="fa-solid fa-hand-pointer"></i> Op mobiel: gebruik de knop “Plan vandaag” op elke taak.</div>
         </div>
 
-        <!-- Overzicht per type -->
+        <!-- Overzicht per type (accordion) -->
         <div class="card">
           <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per type</div>
-          <div id="categoryOverview" class="acc-list"></div>
+          <div id="typeOverview" class="acc-list"></div>
         </div>
       </div>
     </section>
@@ -223,7 +221,7 @@
     </section>
   </main>
 
-  <!-- Floating progress menu (global) -->
+  <!-- Floating progress menu -->
   <div id="progMenu" class="prog-menu hidden">
     <button data-v="0">0%</button>
     <button data-v="25">25%</button>

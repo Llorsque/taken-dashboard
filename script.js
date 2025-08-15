@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => { init(); });
 
 async function init(){
   wireAuthUI();
-  await ensureAuth();      // blocks UI with modal until logged in
+  await ensureAuth();      // blokkeer tot login/profiel
 
   // Load local state
   tasks = LS.get('tasks', []);
@@ -42,7 +42,7 @@ async function init(){
   lastPlanDate = LS.get('lastPlanDate', null);
   notes = LS.get('notes', []);
 
-  // Seed from JSON if empty
+  // Seed uit JSON als leeg
   if(tasks.length===0){
     try{
       const t = await fetch('tasks.json'); if(t.ok) tasks = await t.json();
@@ -74,21 +74,10 @@ async function init(){
     if(!e.target.closest('.user-menu')) gid('userDropdown').classList.add('hidden');
   });
 
-  // Progress menu global
+  // Progress menu
   setupProgressMenu();
 
-  // Mobile sidebar toggle
-  const menuBtn = gid('menuBtn'), sidebar = gid('sidebar'), scrim = gid('scrim');
-  if(menuBtn){
-    const closeSide = ()=>{ sidebar.classList.remove('open'); scrim.classList.remove('show'); };
-    const openSide  = ()=>{ sidebar.classList.add('open'); scrim.classList.add('show'); };
-    menuBtn.addEventListener('click', ()=> sidebar.classList.contains('open') ? closeSide() : openSide() );
-    scrim.addEventListener('click', closeSide);
-    // close when navigating
-    document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', closeSide));
-  }
-
-  // Setup drop zone (desktop)
+  // Drag target
   setupDayPlanDropZone();
 
   renderAll();
@@ -351,7 +340,7 @@ function unlockDayPlan(){
 function renderSuggestions(){
   const ul = gid('suggestList'); ul.innerHTML='';
   let suggestions = getOpenTasks()
-    .filter(t => !dayPlan.includes(t.id)) // hide those already in plan
+    .filter(t => !dayPlan.includes(t.id)) // verberg als al ingepland
     .sort(sortByUrgencyDeadline);
   const max = (userProfile?.prefs?.dailyGoal) ?? 5;
   suggestions = suggestions.slice(0, Math.max(5, max));
@@ -377,7 +366,7 @@ function renderTasksView(){
 
 // ================== Type overview (accordion) ==================
 function renderTypeOverview(){
-  const wrap = gid('categoryOverview'); wrap.innerHTML='';
+  const wrap = gid('typeOverview'); wrap.innerHTML='';
   const groups = new Map();
   getOpenTasks().forEach(t => {
     const key = (t.type||'overig').toLowerCase();
@@ -438,7 +427,7 @@ function renderCalendar(){
   title.textContent = `${monthNames[calMonth]} ${calYear}`;
   grid.innerHTML='';
 
-  // Weekday headers (Mon-first)
+  // Weekdag koppen (ma-first)
   const days = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
   days.forEach(d => {
     const h = document.createElement('div');
@@ -449,7 +438,6 @@ function renderCalendar(){
 
   const first = new Date(calYear, calMonth, 1);
   const last = new Date(calYear, calMonth+1, 0);
-  // Monday-first offset
   const startOffset = (first.getDay()+6)%7;
   for(let i=0;i<startOffset;i++){ grid.appendChild(emptyCell()); }
   for(let d=1; d<=last.getDate(); d++){
@@ -476,8 +464,8 @@ function taskRow(t, {draggable=false, inPlan=false, overdueBadge=false}={}){
   li.dataset.id = t.id;
 
   const actionBtn = inPlan
-    ? `<button class="btn" onclick="removeFromDayPlan('${t.id}')" title="Uit dagplanning"><i class="fa-solid fa-minus"></i> <span class="hide-sm">Verwijder</span></button>`
-    : `<button class="btn" onclick="addToDayPlan('${t.id}')" title="Plan vandaag"><i class="fa-solid fa-calendar-plus"></i> <span class="hide-sm">Plan</span></button>`;
+    ? `<button class="btn" onclick="removeFromDayPlan('${t.id}')" title="Uit dagplanning"><i class="fa-solid fa-minus"></i> Verwijder</button>`
+    : `<button class="btn" onclick="addToDayPlan('${t.id}')" title="Plan vandaag"><i class="fa-solid fa-calendar-plus"></i> Plan</button>`;
 
   li.innerHTML = `
     <div class="item-main">
@@ -541,7 +529,6 @@ function addToDayPlan(id){
   if(dayPlanLocked){ alert('Dagplanning is bevestigd. Ontgrendel om te wijzigen.'); return; }
   if(!dayPlan.includes(id)) dayPlan.push(id);
   LS.set('dayPlan', dayPlan);
-  // Remove from suggestions immediately (re-render dashboard parts)
   renderDayPlan(); renderSuggestions(); renderMonitoring();
 }
 
@@ -557,7 +544,7 @@ function setupProgressMenu(){
   const menu = gid('progMenu');
   menu.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if(!btn) return;
-    const v = parseInt(btn.dataset.v,10);
+    const v = parseInt(btn.dataset.v ?? btn.getAttribute('data-v'),10);
     if(isNaN(v)) return;
     if(!progMenuId) return closeProgMenu();
     const t = tasks.find(x=>x.id===progMenuId) || archive.find(x=>x.id===progMenuId);
@@ -657,7 +644,7 @@ function renderMonitoring(){
   gid('statWeekCompleted').textContent = weekCount.toString();
   const withDeadline = archive.filter(t=>t.deadline);
   const onTime = withDeadline.filter(t => new Date(t.completedAt) <= endOfDay(t.deadline));
-  const pct = withDeadline.length? Math.round(onTime.length*100/withDeadline.length):0;
+  const pct = withDeadline.length? Math.round(onTime.length*100/offers.length):0;
   gid('statOnTime').textContent = pct + '%';
   const durations = archive.filter(t=>t.completedAt && t.createdAt).map(t => (new Date(t.completedAt)-new Date(t.createdAt))/36e5);
   const avg = durations.length? (durations.reduce((a,b)=>a+b,0)/durations.length).toFixed(1):'–';
@@ -672,6 +659,19 @@ function updateProgress(id, val){
   t.progress = val;
   persistTasks();
   renderAll();
+}
+function onSaveProfile(e){ e.preventDefault();
+  userProfile.name = gid('profName').value.trim()||userProfile.name;
+  userProfile.email = gid('profEmail').value.trim()||userProfile.email;
+  userProfile.prefs = {
+    dailyGoal: parseInt(gid('profDailyGoal').value||'5',10),
+    workStart: gid('profStart').value,
+    workEnd: gid('profEnd').value,
+    notify: gid('profNotify').value
+  };
+  LS.set('userProfile', userProfile);
+  applyProfileToUI();
+  alert('Instellingen opgeslagen.');
 }
 
 function typeColor(type){
@@ -731,5 +731,4 @@ function persistOverdue(){ LS.set('overdueIds', overdueIds); }
 function persistPlan(){ LS.set('dayPlan', dayPlan); LS.set('dayPlanLocked', dayPlanLocked); LS.set('lastPlanDate', lastPlanDate); }
 function persistNotes(){ LS.set('notes', notes); }
 function persistAll(){ persistTasks(); persistArchive(); persistOverdue(); persistPlan(); }
-
 function cap(s){ return (s||'').charAt(0).toUpperCase() + (s||'').slice(1); }
