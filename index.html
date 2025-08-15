@@ -15,16 +15,16 @@
   <!-- Sidebar (vast, desktop) -->
   <aside class="sidebar" id="sidebar">
     <div class="brand"><i class="fa-solid fa-bolt"></i> Taken</div>
-    <nav class="nav">
-      <a href="#" onclick="return navigate('dashboard')" class="active"><i class="fa-solid fa-list-check"></i> Dashboard</a>
-      <a href="#" onclick="return navigate('tasks')"><i class="fa-solid fa-table-list"></i> Alle taken</a>
-      <a href="#" onclick="return navigate('add')"><i class="fa-solid fa-plus"></i> Taak toevoegen</a>
-      <a href="#" onclick="return navigate('calendar')"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
-      <a href="#" onclick="return navigate('overdue')"><i class="fa-solid fa-circle-exclamation"></i> Achterstallig</a>
-      <a href="#" onclick="return navigate('archive')"><i class="fa-solid fa-box-archive"></i> Archief</a>
-      <a href="#" onclick="return navigate('notes')"><i class="fa-solid fa-note-sticky"></i> Notitieblok</a>
-      <a href="#" onclick="return navigate('monitor')"><i class="fa-solid fa-chart-line"></i> Monitoring</a>
-      <a href="#" onclick="return navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</a>
+    <nav class="nav" id="nav">
+      <a href="#" data-view="dashboard" class="active"><i class="fa-solid fa-list-check"></i> Dashboard</a>
+      <a href="#" data-view="tasks"><i class="fa-solid fa-table-list"></i> Alle taken</a>
+      <a href="#" data-view="add"><i class="fa-solid fa-plus"></i> Taak toevoegen</a>
+      <a href="#" data-view="calendar"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
+      <a href="#" data-view="overdue"><i class="fa-solid fa-circle-exclamation"></i> Achterstallig</a>
+      <a href="#" data-view="archive"><i class="fa-solid fa-box-archive"></i> Archief</a>
+      <a href="#" data-view="notes"><i class="fa-solid fa-note-sticky"></i> Notitieblok</a>
+      <a href="#" data-view="monitor"><i class="fa-solid fa-chart-line"></i> Monitoring</a>
+      <a href="#" data-view="profile"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</a>
     </nav>
   </aside>
 
@@ -43,7 +43,7 @@
             <div id="ddName">Gebruiker</div>
             <div id="ddEmail" class="muted smalltext"></div>
           </div>
-          <button onclick="navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</button>
+          <button data-view="profile"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</button>
           <button onclick="lockApp()"><i class="fa-solid fa-lock"></i> Vergrendel (uitloggen)</button>
         </div>
       </div>

@@ -1,18 +1,13 @@
-
 :root{ --blue:#212945; --aqua:#52E8E8; --bg:#f4f6f8; --card:#fff; --muted:#6b7280; }
 *{ box-sizing:border-box }
 html,body{ height:100% }
 body{ margin:0; font-family:'Archivo',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--blue) }
 .smalltext{ font-size:12px }
-
-/* Sidebar (vast) */
 .sidebar{ position:fixed; left:0; top:0; bottom:0; width:240px; background:var(--blue); color:#fff; padding:20px; display:flex; flex-direction:column; gap:16px; box-shadow:2px 0 12px rgba(0,0,0,.08); z-index:6 }
 .brand{ font-weight:700; font-size:20px; display:flex; align-items:center; gap:10px }
 .nav{ display:flex; flex-direction:column; gap:8px }
 .nav a{ color:#fff; text-decoration:none; padding:10px 12px; border-radius:10px; display:flex; gap:10px; align-items:center; font-size:15px }
 .nav a:hover, .nav a.active{ background:#1a2138 }
-
-/* Topbar */
 .topbar{ position:fixed; left:240px; right:0; top:0; height:60px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 12px 0 16px; background:rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-bottom:1px solid #e6e8ee; z-index:7 }
 .topbar-right{ display:flex; align-items:center; gap:10px }
 .user-menu{ position:relative }
@@ -23,17 +18,13 @@ body{ margin:0; font-family:'Archivo',system-ui,-apple-system,Segoe UI,Roboto,Ar
 .dropdown button{ width:100%; background:#fff; border:0; text-align:left; padding:10px; border-radius:8px; cursor:pointer }
 .dropdown button:hover{ background:#f2f5f9 }
 .dropdown-header{ padding:10px 10px 8px 10px; border-bottom:1px solid #eef1f6; margin-bottom:6px }
-
-/* Content */
 .content{ margin-left:260px; padding:88px 16px 24px 16px; max-width:1100px }
 h1{ margin:0 0 16px 0 }
 .clock{ margin-left:8px; color:var(--muted); font-weight:600 }
 .card{ background:var(--card); border-radius:16px; padding:14px; box-shadow:0 4px 20px rgba(0,0,0,.06) }
 .card-header{ font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:10px }
 .card-actions{ display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap }
-
 .grid-1{ display:grid; grid-template-columns:1fr; gap:18px }
-
 .list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px }
 .item{ background:#fff; border:1px solid #e6e8ee; border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between }
 .item-main{ display:flex; align-items:center; gap:12px; min-width:0 }
@@ -53,19 +44,14 @@ h1{ margin:0 0 16px 0 }
 .icon-btn{ background:transparent; border:0; color:#334; cursor:pointer; font-size:18px }
 .muted{ color:var(--muted); font-size:12px }
 .hidden{ display:none!important }
-
-/* Chips */
 .chip{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; gap:6px }
 .warn{ background:#fff6d1; border-color:#f6e3a1; color:#8a6b00 }
 .ok{ background:#e8fff4; border-color:#c9f3de; color:#0b6b3a }
-
 .filters{ display:flex; gap:10px; margin:8px 0 14px 0; flex-wrap:wrap }
 .form{ display:grid; gap:10px; max-width:520px }
 .form label{ display:grid; gap:6px; font-weight:600 }
 .form input[type="text"], .form input[type="date"], .form input[type="number"], .form input[type="email"], .form input[type="time"], .form select, .form textarea{ border:1px solid #d9dee9; border-radius:10px; padding:10px; font:inherit; background:#fff; width:100% }
 .form .inline{ display:flex; align-items:center; gap:8px }
-
-/* Accordion list for types */
 .acc-list{ display:flex; flex-direction:column; gap:8px }
 .acc{ border:1px solid #e6e8ee; border-radius:12px; overflow:hidden; background:#fff }
 .acc-header{ padding:10px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer }
@@ -73,8 +59,6 @@ h1{ margin:0 0 16px 0 }
 .acc-header .count{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:2px 8px; font-weight:700; font-size:12px }
 .acc-body{ display:none; padding:8px 10px 10px 10px }
 .acc.open .acc-body{ display:block }
-
-/* Calendar */
 .calendar-controls{ display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; }
 #calTitle{ min-width: 200px; text-align:center; font-weight:700; }
 .calendar{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:12px }
@@ -85,29 +69,20 @@ h1{ margin:0 0 16px 0 }
 .small.urgent{ border-color:#e11d48 }
 .small.warning{ border-color:#f59e0b }
 .small.safe{ border-color:#10b981 }
-
 .stats{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; max-width:1000px }
 .stat{ background:#fff; border:1px solid #e6e8ee; border-radius:14px; padding:16px }
 .stat-number{ font-weight:800; font-size:28px }
 .stat-label{ color:var(--muted); font-size:12px }
-
-/* Detail pane */
 .detail-pane{ position:fixed; top:60px; right:-420px; width:420px; bottom:0; background:#fff; border-left:1px solid #e6e8ee; box-shadow:-4px 0 20px rgba(0,0,0,.06); transition:right .28s ease; padding:18px; overflow:auto; z-index:8 }
 .detail-pane.open{ right:0 }
 .detail-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px }
 .detail-body{ display:grid; gap:10px }
 .detail-actions{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap }
-
-/* Drag & drop visuals */
 .droptarget{ min-height: 24px; padding: 6px; border-radius: 12px; border: 2px dashed transparent }
 .droptarget.drag-over{ border-color: var(--aqua); background: #f0fbfb }
-
-/* Floating progress menu */
 .prog-menu{ position:fixed; background:#fff; border:1px solid #e6e8ee; border-radius:10px; padding:6px; box-shadow:0 10px 24px rgba(0,0,0,.12); z-index:1000; display:flex; gap:6px }
 .prog-menu button{ background:#f6f8fb; border:1px solid #d9dee9; border-radius:8px; padding:6px 8px; font-size:12px; cursor:pointer }
 .prog-menu button:hover{ background:#eef1f6 }
-
-/* Auth modal */
 .auth-overlay{ position:fixed; inset:0; background:rgba(20,24,36,.5); display:flex; align-items:center; justify-content:center; z-index:999 }
 .auth-overlay.hidden{ display:none }
 .auth-modal{ background:#fff; width:420px; border-radius:16px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,.25) }
