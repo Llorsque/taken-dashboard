@@ -409,8 +409,19 @@ function renderCalendar(){
   const monthNames = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
   title.textContent = `${monthNames[calMonth]} ${calYear}`;
   grid.innerHTML='';
+
+  // Weekday headers (Mon-first)
+  const days = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  days.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-head';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
   const first = new Date(calYear, calMonth, 1);
   const last = new Date(calYear, calMonth+1, 0);
+  // Monday-first offset
   const startOffset = (first.getDay()+6)%7;
   for(let i=0;i<startOffset;i++){ grid.appendChild(emptyCell()); }
   for(let d=1; d<=last.getDate(); d++){
