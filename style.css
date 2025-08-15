@@ -18,6 +18,7 @@ body{ margin:0; font-family:'Archivo',system-ui,-apple-system,Segoe UI,Roboto,Ar
 
 /* Topbar */
 .topbar{ position:fixed; left:240px; right:0; top:0; height:60px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 12px 0 16px; background:rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-bottom:1px solid #e6e8ee; z-index:7 }
+.topbar-right{ display:flex; align-items:center; gap:10px }
 .hamburger{ display:none; background:#eef1f6; border:1px solid #d9dee9; border-radius:10px; padding:8px 10px; cursor:pointer }
 .user-menu{ position:relative }
 .avatar-btn{ display:flex; align-items:center; gap:8px; background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:6px 10px; cursor:pointer }
@@ -45,22 +46,23 @@ h1{ margin:0 0 16px 0 }
 .title{ font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:330px }
 .meta{ display:flex; gap:8px; align-items:center; color:var(--muted); font-size:12px; flex-wrap:wrap }
 .meta i{ opacity:.8 }
-.progress-wrap{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.progress-wrap{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
 .progress{ width:220px; height:8px; background:#eef1f6; border-radius:999px; overflow:hidden; flex-shrink:0; background: linear-gradient(to bottom, var(--type-color,transparent) 0 3px, #eef1f6 3px 100%) }
 .progress > span{ display:block; height:100%; width:0%; background:var(--aqua); transition:width .25s ease }
 .progress.urgent>span{ background:#e11d48 }
 .progress.warning>span{ background:#f59e0b }
 .progress.safe>span{ background:#10b981 }
-.prog{ width:120px; height:6px; appearance:none; -webkit-appearance:none; background:#e5e7eb; border-radius:999px; outline:none }
-.prog::-webkit-slider-thumb{ appearance:none; -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#212945; cursor:pointer }
-.prog::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#212945; border:0; cursor:pointer }
-
+.prog-chip{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:6px 10px; font-size:12px; cursor:pointer }
 .btn{ background:#eef1f6; border:0; padding:8px 12px; border-radius:10px; cursor:pointer }
 .btn.primary{ background:var(--aqua); color:#0b1a2a; font-weight:600 }
 .icon-btn{ background:transparent; border:0; color:#334; cursor:pointer; font-size:18px }
 .muted{ color:var(--muted); font-size:12px }
-.alert{ background:#ffe1e1; color:#b00020; padding:10px 12px; border-radius:12px; margin-bottom:16px; display:flex; gap:10px; align-items:center }
 .hidden{ display:none!important }
+
+/* Chips */
+.chip{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; gap:6px }
+.warn{ background:#fff6d1; border-color:#f6e3a1; color:#8a6b00 }
+.ok{ background:#e8fff4; border-color:#c9f3de; color:#0b6b3a }
 
 .filters{ display:flex; gap:10px; margin:8px 0 14px 0; flex-wrap:wrap }
 .form{ display:grid; gap:10px; max-width:520px }
@@ -68,10 +70,16 @@ h1{ margin:0 0 16px 0 }
 .form input[type="text"], .form input[type="date"], .form input[type="number"], .form input[type="email"], .form input[type="time"], .form select, .form textarea{ border:1px solid #d9dee9; border-radius:10px; padding:10px; font:inherit; background:#fff; width:100% }
 .form .inline{ display:flex; align-items:center; gap:8px }
 
-.chips{ display:flex; flex-wrap:wrap; gap:8px }
-.chip{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:6px 10px; font-size:12px; display:flex; gap:8px; align-items:center; cursor:pointer }
-.chip .count{ background:#fff; border:1px solid #d9dee9; border-radius:999px; padding:2px 6px; font-weight:700 }
+/* Accordion list for types */
+.acc-list{ display:flex; flex-direction:column; gap:8px }
+.acc{ border:1px solid #e6e8ee; border-radius:12px; overflow:hidden; background:#fff }
+.acc-header{ padding:10px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer }
+.acc-header .left{ display:flex; align-items:center; gap:10px }
+.acc-header .count{ background:#eef1f6; border:1px solid #d9dee9; border-radius:999px; padding:2px 8px; font-weight:700; font-size:12px }
+.acc-body{ display:none; padding:8px 10px 10px 10px }
+.acc.open .acc-body{ display:block }
 
+/* Calendar */
 .calendar-controls{ display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; }
 #calTitle{ min-width: 200px; text-align:center; font-weight:700; }
 .calendar{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:12px }
@@ -102,6 +110,11 @@ h1{ margin:0 0 16px 0 }
 /* Drag & drop visuals */
 .droptarget{ min-height: 24px; padding: 6px; border-radius: 12px; border: 2px dashed transparent }
 .droptarget.drag-over{ border-color: var(--aqua); background: #f0fbfb }
+
+/* Floating progress menu */
+.prog-menu{ position:fixed; background:#fff; border:1px solid #e6e8ee; border-radius:10px; padding:6px; box-shadow:0 10px 24px rgba(0,0,0,.12); z-index:1000; display:flex; gap:6px }
+.prog-menu button{ background:#f6f8fb; border:1px solid #d9dee9; border-radius:8px; padding:6px 8px; font-size:12px; cursor:pointer }
+.prog-menu button:hover{ background:#eef1f6 }
 
 /* Auth modal */
 .auth-overlay{ position:fixed; inset:0; background:rgba(20,24,36,.5); display:flex; align-items:center; justify-content:center; z-index:999 }
@@ -135,7 +148,6 @@ h1{ margin:0 0 16px 0 }
   .item{ padding:10px }
   .meta{ gap:6px }
   .progress{ width:130px }
-  .prog{ width:100px }
   .stats{ grid-template-columns:1fr; }
   .auth-modal{ width:92vw }
   .detail-pane{ width:100%; right:-100%; }

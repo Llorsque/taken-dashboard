@@ -24,6 +24,8 @@ let dayPlanLocked = false;
 let lastPlanDate = null;
 let notes = [];
 
+let progMenuId = null;
+
 // ================== Boot ==================
 document.addEventListener('DOMContentLoaded', () => { init(); });
 
@@ -71,6 +73,9 @@ async function init(){
   document.addEventListener('click', (e)=>{
     if(!e.target.closest('.user-menu')) gid('userDropdown').classList.add('hidden');
   });
+
+  // Progress menu global
+  setupProgressMenu();
 
   // Mobile sidebar toggle
   const menuBtn = gid('menuBtn'), sidebar = gid('sidebar'), scrim = gid('scrim');
@@ -274,14 +279,18 @@ function deleteNote(id){ notes = notes.filter(n=>n.id!==id); persistNotes(); ren
 
 // ================== Dashboard ==================
 function renderDashboard(){
-  renderUrgentAlert();
+  renderUrgentIndicators();
   renderDayPlan();
   renderSuggestions();
-  renderCategoryOverview();
+  renderTypeOverview();
 }
-function renderUrgentAlert(){
-  const alert = gid('urgentAlert');
-  alert.classList.toggle('hidden', !getOpenTasks().some(t => getUrgency(t)==='urgent'));
+function renderUrgentIndicators(){
+  const urgCount = getOpenTasks().filter(t => getUrgency(t)==='urgent').length;
+  const topChip = gid('urgentChipTop'); const cardChip = gid('urgentChipCard');
+  gid('urgCountTop').textContent = urgCount;
+  gid('urgCountCard').textContent = urgCount;
+  topChip.classList.toggle('hidden', urgCount===0);
+  cardChip.classList.toggle('hidden', urgCount===0);
 }
 
 // Day plan
@@ -304,6 +313,10 @@ function renderDayPlan(){
           <input type="checkbox" ${t.done?'checked':''} onchange="toggleDone('${t.id}', this.checked)" />
           <div class="title">${esc(t.title)}</div>
           <div class="meta"><i class="fa-regular fa-calendar"></i> ${fmtDate(t.deadline)} • <span class="badge ${getUrgency(t)}">${urgLabel(getUrgency(t))}</span></div>
+        </div>
+        <div class="progress-wrap">
+          ${progressBarFor(t)}
+          <button class="prog-chip" onclick="openProgMenu(event,'${t.id}')">${t.progress||0}% ▾</button>
         </div>`;
       checklist.appendChild(row);
     });
@@ -337,7 +350,9 @@ function unlockDayPlan(){
 // Suggestions
 function renderSuggestions(){
   const ul = gid('suggestList'); ul.innerHTML='';
-  let suggestions = getOpenTasks().sort(sortByUrgencyDeadline);
+  let suggestions = getOpenTasks()
+    .filter(t => !dayPlan.includes(t.id)) // hide those already in plan
+    .sort(sortByUrgencyDeadline);
   const max = (userProfile?.prefs?.dailyGoal) ?? 5;
   suggestions = suggestions.slice(0, Math.max(5, max));
   suggestions.forEach(t => ul.appendChild(taskRow(t, { draggable:true })));
@@ -360,16 +375,29 @@ function renderTasksView(){
   list.sort(sortByUrgencyDeadline).forEach(t => ul.appendChild(taskRow(t, { draggable:true })));
 }
 
-// ================== Category overview ==================
-function renderCategoryOverview(){
+// ================== Type overview (accordion) ==================
+function renderTypeOverview(){
   const wrap = gid('categoryOverview'); wrap.innerHTML='';
-  const map = new Map();
-  getOpenTasks().forEach(t => map.set(t.category||'Ongecategoriseerd', (map.get(t.category||'Ongecategoriseerd')||0)+1));
-  [...map.entries()].sort().forEach(([cat,count]) => {
-    const div = document.createElement('div');
-    div.className='chip'; div.innerHTML = `<i class="fa-solid fa-tag"></i> ${esc(cat)} <span class="count">${count}</span>`;
-    div.addEventListener('click', () => { navigate('tasks'); gid('filterCategory').value = cat==='Ongecategoriseerd'?'':cat; renderTasksView(); });
-    wrap.appendChild(div);
+  const groups = new Map();
+  getOpenTasks().forEach(t => {
+    const key = (t.type||'overig').toLowerCase();
+    if(!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(t);
+  });
+  const order = ['mail','telefoontje','uitzoekwerk','overleg','documentatie','creatief','administratie','overig'];
+  const keys = Array.from(groups.keys()).sort((a,b)=> order.indexOf(a)-order.indexOf(b));
+  keys.forEach(key => {
+    const list = groups.get(key).sort(sortByUrgencyDeadline);
+    const acc = document.createElement('div'); acc.className='acc';
+    const header = document.createElement('div'); header.className='acc-header';
+    header.innerHTML = `<div class="left"><i class="fa-solid fa-tag"></i> ${cap(key)}</div><div class="count">${list.length}</div>`;
+    const body = document.createElement('div'); body.className='acc-body';
+    const ul = document.createElement('ul'); ul.className='list';
+    list.forEach(t => ul.appendChild(taskRow(t, { draggable:true })));
+    body.appendChild(ul);
+    header.addEventListener('click', ()=> acc.classList.toggle('open'));
+    acc.appendChild(header); acc.appendChild(body);
+    wrap.appendChild(acc);
   });
 }
 
@@ -465,7 +493,7 @@ function taskRow(t, {draggable=false, inPlan=false, overdueBadge=false}={}){
     </div>
     <div class="progress-wrap">
       ${progressBarFor(t)}
-      <input type="range" class="prog" min="0" max="100" value="${t.progress||0}" oninput="updateProgress('${t.id}', this.value)" />
+      <button class="prog-chip" onclick="openProgMenu(event,'${t.id}')">${t.progress||0}% ▾</button>
       ${actionBtn}
     </div>`;
 
@@ -513,15 +541,46 @@ function addToDayPlan(id){
   if(dayPlanLocked){ alert('Dagplanning is bevestigd. Ontgrendel om te wijzigen.'); return; }
   if(!dayPlan.includes(id)) dayPlan.push(id);
   LS.set('dayPlan', dayPlan);
-  renderDayPlan();
+  // Remove from suggestions immediately (re-render dashboard parts)
+  renderDayPlan(); renderSuggestions(); renderMonitoring();
 }
 
 function removeFromDayPlan(id){
   if(dayPlanLocked){ alert('Dagplanning is bevestigd. Ontgrendel om te wijzigen.'); return; }
   dayPlan = dayPlan.filter(x => x !== id);
   LS.set('dayPlan', dayPlan);
-  renderDayPlan();
+  renderDayPlan(); renderSuggestions(); renderMonitoring();
 }
+
+// ================== Progress quick menu ==================
+function setupProgressMenu(){
+  const menu = gid('progMenu');
+  menu.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    const v = parseInt(btn.dataset.v,10);
+    if(isNaN(v)) return;
+    if(!progMenuId) return closeProgMenu();
+    const t = tasks.find(x=>x.id===progMenuId) || archive.find(x=>x.id===progMenuId);
+    if(!t) return closeProgMenu();
+    t.progress = v;
+    persistTasks();
+    closeProgMenu();
+    renderAll();
+  });
+  document.addEventListener('click', (e)=>{
+    if(e.target.closest('.prog-menu') || e.target.closest('.prog-chip')) return;
+    closeProgMenu();
+  });
+}
+function openProgMenu(ev, id){
+  progMenuId = id;
+  const menu = gid('progMenu');
+  const x = ev.clientX, y = ev.clientY;
+  menu.style.left = Math.max(6, x-10) + 'px';
+  menu.style.top = (y+10) + 'px';
+  menu.classList.remove('hidden');
+}
+function closeProgMenu(){ gid('progMenu').classList.add('hidden'); progMenuId=null; }
 
 // ================== Detail pane ==================
 let currentDetailId = null;
@@ -672,3 +731,5 @@ function persistOverdue(){ LS.set('overdueIds', overdueIds); }
 function persistPlan(){ LS.set('dayPlan', dayPlan); LS.set('dayPlanLocked', dayPlanLocked); LS.set('lastPlanDate', lastPlanDate); }
 function persistNotes(){ LS.set('notes', notes); }
 function persistAll(){ persistTasks(); persistArchive(); persistOverdue(); persistPlan(); }
+
+function cap(s){ return (s||'').charAt(0).toUpperCase() + (s||'').slice(1); }

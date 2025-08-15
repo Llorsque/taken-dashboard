@@ -32,26 +32,26 @@
   <!-- Topbar with user + hamburger -->
   <header class="topbar">
     <button id="menuBtn" class="hamburger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
-    <div></div>
-    <div class="user-menu">
-      <button id="userBtn" class="avatar-btn">
-        <span id="avatarInitials">U</span>
-        <i class="fa-solid fa-caret-down"></i>
-      </button>
-      <div id="userDropdown" class="dropdown hidden">
-        <div class="dropdown-header">
-          <div id="ddName">Gebruiker</div>
-          <div id="ddEmail" class="muted smalltext"></div>
+    <div class="topbar-right">
+      <span id="urgentChipTop" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountTop">0</span> urgent</span>
+      <div class="user-menu">
+        <button id="userBtn" class="avatar-btn">
+          <span id="avatarInitials">U</span>
+          <i class="fa-solid fa-caret-down"></i>
+        </button>
+        <div id="userDropdown" class="dropdown hidden">
+          <div class="dropdown-header">
+            <div id="ddName">Gebruiker</div>
+            <div id="ddEmail" class="muted smalltext"></div>
+          </div>
+          <button onclick="navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</button>
+          <button onclick="lockApp()"><i class="fa-solid fa-lock"></i> Vergrendel (uitloggen)</button>
         </div>
-        <button onclick="navigate('profile')"><i class="fa-solid fa-user-gear"></i> Profiel & Instellingen</button>
-        <button onclick="lockApp()"><i class="fa-solid fa-lock"></i> Vergrendel (uitloggen)</button>
       </div>
     </div>
   </header>
 
   <main class="content">
-    <div id="urgentAlert" class="alert hidden"><i class="fa-solid fa-triangle-exclamation"></i> Er zijn urgente taken (rood).</div>
-
     <!-- DASHBOARD -->
     <section id="dashboard" class="view active">
       <h1>Dashboard <span id="clock" class="clock"></span></h1>
@@ -70,15 +70,18 @@
 
         <!-- Suggesties op urgentie -->
         <div class="card">
-          <div class="card-header"><i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)</div>
+          <div class="card-header">
+            <i class="fa-solid fa-fire-flame-curved"></i> Suggesties (urgent)
+            <span id="urgentChipCard" class="chip warn hidden"><i class="fa-solid fa-bell"></i> <span id="urgCountCard">0</span> urgent</span>
+          </div>
           <ul id="suggestList" class="list"></ul>
           <div class="muted smalltext touch-hint"><i class="fa-solid fa-hand-pointer"></i> Op mobiel: gebruik de knop “Plan vandaag” op elke taak.</div>
         </div>
 
-        <!-- Overzicht per categorie -->
+        <!-- Overzicht per type -->
         <div class="card">
-          <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per categorie</div>
-          <div id="categoryOverview" class="chips"></div>
+          <div class="card-header"><i class="fa-solid fa-layer-group"></i> Overzicht per type</div>
+          <div id="categoryOverview" class="acc-list"></div>
         </div>
       </div>
     </section>
@@ -219,6 +222,15 @@
       </form>
     </section>
   </main>
+
+  <!-- Floating progress menu (global) -->
+  <div id="progMenu" class="prog-menu hidden">
+    <button data-v="0">0%</button>
+    <button data-v="25">25%</button>
+    <button data-v="50">50%</button>
+    <button data-v="75">75%</button>
+    <button data-v="100">100%</button>
+  </div>
 
   <!-- Details pane -->
   <aside id="detailPane" class="detail-pane">
