@@ -42,7 +42,7 @@ async function init(){
   lastPlanDate = LS.get('lastPlanDate', null);
   notes = LS.get('notes', []);
 
-  // Seed uit JSON als leeg
+  // Seed uit JSON als leeg (optioneel)
   if(tasks.length===0){
     try{
       const t = await fetch('tasks.json'); if(t.ok) tasks = await t.json();
@@ -82,6 +82,17 @@ async function init(){
 
   renderAll();
   startClock();
+}
+
+// ============ RENDER ALL (fix) ============
+function renderAll(){
+  renderDashboard();
+  renderTasksView();
+  renderCalendar();
+  renderOverdue();
+  renderArchive();
+  renderMonitoring();
+  renderNotes();
 }
 
 // ================== Auth (local) ==================
@@ -644,7 +655,7 @@ function renderMonitoring(){
   gid('statWeekCompleted').textContent = weekCount.toString();
   const withDeadline = archive.filter(t=>t.deadline);
   const onTime = withDeadline.filter(t => new Date(t.completedAt) <= endOfDay(t.deadline));
-  const pct = withDeadline.length? Math.round(onTime.length*100/offers.length):0;
+  const pct = withDeadline.length? Math.round(onTime.length*100/withDeadline.length):0; // FIXED
   gid('statOnTime').textContent = pct + '%';
   const durations = archive.filter(t=>t.completedAt && t.createdAt).map(t => (new Date(t.completedAt)-new Date(t.createdAt))/36e5);
   const avg = durations.length? (durations.reduce((a,b)=>a+b,0)/durations.length).toFixed(1):'–';
@@ -652,14 +663,6 @@ function renderMonitoring(){
 }
 
 // ================== Utilities & persistence ==================
-function updateProgress(id, val){
-  val = clamp(parseInt(val||'0',10), 0, 100);
-  const t = tasks.find(x=>x.id===id);
-  if(!t) return;
-  t.progress = val;
-  persistTasks();
-  renderAll();
-}
 function onSaveProfile(e){ e.preventDefault();
   userProfile.name = gid('profName').value.trim()||userProfile.name;
   userProfile.email = gid('profEmail').value.trim()||userProfile.email;
